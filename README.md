@@ -104,3 +104,9 @@ npm install -D @types/express
 ```bash
 npm install mongoose
 ```
+
+#### 2.3.3. Pug
+
+```bash
+npm install pug
+```

@@ -17,6 +17,11 @@
   },
   "author": "Hiroyasu Shimizu",
   "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "mongoose": "^6.1.7",
+    "pug": "^3.0.2"
+  },
   "devDependencies": {
     "@babel/core": "^7.16.7",
     "@babel/preset-env": "^7.16.8",
@@ -41,9 +46,5 @@
     "prettier-plugin-sh": "^0.8.1",
     "supertest": "^6.2.1",
     "ts-node": "^10.4.0"
-  },
-  "dependencies": {
-    "express": "^4.17.2",
-    "mongoose": "^6.1.7"
   }
 }

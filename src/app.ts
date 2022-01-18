@@ -1,4 +1,5 @@
 // app.ts
+import path from "path";
 import express from "express";
 import { connect } from "mongoose";
 import indexRouter from "./routes";
@@ -13,9 +14,16 @@ connect(mongoURL)
   })
   .catch(console.error);
 
-// Set up request body parser.
+// Setup template engine.
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "pug");
+
+// Setup request body parser.
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Setup static assets.
+app.use(express.static(path.join(__dirname, "public")));
 
 // Setup routers.
 app.use(indexRouter);
