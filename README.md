@@ -124,3 +124,14 @@ npm install -D @types/http-errors
 npm install morgan
 npm install -D @types/morgan
 ```
+
+#### 2.3.6. Other Dependencies
+
+```bash
+# Express validator.
+npm install express-validator
+
+# luxon.
+npm install luxon
+npm install -D @types/luxon
+```
