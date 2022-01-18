@@ -43,3 +43,18 @@ npm install -D prettier @prettier/plugin-pug prettier-plugin-sh
 npm install -D eslint eslint-config-prettier eslint-plugin-import
 npm init @eslint/config
 ```
+
+#### 2.2.4. Husky
+
+```bash
+npm install -D husky
+npx husky install
+npm set-script prepare "husky install"
+```
+
+Add some empty Husky scripts.
+
+```bash
+npx husky add .husky/pre-commit "exit 0"
+npx husky add .husky/pre-push "exit 0"
+```
