@@ -5,7 +5,7 @@ import Book from "../models/book";
 import BookInstance from "../models/bookInstance";
 import Genre from "../models/genre";
 
-export async function indexApi(req: Request, res: Response) {
+export const indexApi = async (req: Request, res: Response) => {
   const [
     bookCount,
     bookInstanceCount,
@@ -28,4 +28,11 @@ export async function indexApi(req: Request, res: Response) {
       genreCount,
     },
   });
-}
+};
+
+export const bookListApi = async (req: Request, res: Response) => {
+  const bookList = await Book.find({}, "title author")
+    .sort({ title: 1 })
+    .populate<{ author: Author }>("author");
+  return res.json({ bookList });
+};
