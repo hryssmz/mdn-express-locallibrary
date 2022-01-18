@@ -1,5 +1,6 @@
 // apis/genreApi.ts
 import { Request, Response } from "express";
+import { body, validationResult } from "express-validator";
 import Book from "../models/book";
 import Genre from "../models/genre";
 
@@ -22,3 +23,25 @@ export const genreDetailApi = async (req: Request, res: Response) => {
     return res.status(500).json(err);
   }
 };
+
+export const genreCreateApi = [
+  body("name", "Genre name required").trim().isLength({ min: 1 }).escape(),
+
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ genre: req.body, errors: errors.array() });
+    }
+    try {
+      const foundGenre = await Genre.findOne(req.body);
+      if (foundGenre !== null) {
+        // Genre exists, redirect to its detail page.
+        return res.redirect(foundGenre.url);
+      }
+      const genre = await Genre.create(req.body);
+      return res.redirect(genre.url);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  },
+];

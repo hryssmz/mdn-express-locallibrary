@@ -1,5 +1,6 @@
 // apis/authorApi.ts
 import { Request, Response } from "express";
+import { body, validationResult } from "express-validator";
 import Author from "../models/author";
 import Book from "../models/book";
 
@@ -22,3 +23,41 @@ export const authorDetailApi = async (req: Request, res: Response) => {
     return res.status(500).json(err);
   }
 };
+
+export const authorCreateApi = [
+  body("firstName")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("First name must be specified.")
+    .isAlphanumeric()
+    .withMessage("First name has non-alphanumeric characters."),
+  body("familyName")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("Family name must be specified.")
+    .isAlphanumeric()
+    .withMessage("Family name has non-alphanumeric characters."),
+  body("dateOfBirth", "Invalid date of birth")
+    .optional({ checkFalsy: true })
+    .isISO8601()
+    .toDate(),
+  body("dateOfDeath", "Invalid date of death")
+    .optional({ checkFalsy: true })
+    .isISO8601()
+    .toDate(),
+
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ author: req.body, errors: errors.array() });
+    }
+    try {
+      const author = await Author.create(req.body);
+      return res.redirect(author.url);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  },
+];

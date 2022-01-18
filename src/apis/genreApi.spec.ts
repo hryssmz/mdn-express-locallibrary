@@ -5,13 +5,14 @@ import request from "supertest";
 import { testMongoURL } from "../utils";
 import Book from "../models/book";
 import Genre from "../models/genre";
-import { genreListApi, genreDetailApi } from "./genreApi";
+import { genreListApi, genreDetailApi, genreCreateApi } from "./genreApi";
 
 describe("test genre APIs", () => {
   const app = express();
   app.use(express.json());
   app.get("/genres", genreListApi);
   app.get("/genre/:id", genreDetailApi);
+  app.post("/genres/create", genreCreateApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
@@ -61,5 +62,47 @@ describe("test genre APIs", () => {
 
     expect(res3.status).toBe(500);
     expect(res3.body.name).toBe("CastError");
+  });
+
+  test("POST /genres/create", async () => {
+    const res = await request(app)
+      .post("/genres/create")
+      .send({ name: "     Fantasy     " });
+
+    expect(res.status).toBe(302);
+
+    const genres = await Genre.find({ name: "Fantasy" });
+
+    expect(genres.length).toBe(1);
+    expect(genres[0].name).toBe("Fantasy");
+    expect(res.text).toBe(`Found. Redirecting to ${genres[0].url}`);
+
+    // Create an genre with an existing name.
+    const res2 = await request(app)
+      .post("/genres/create")
+      .send({ name: "Fantasy" });
+
+    expect(res2.status).toBe(302);
+    expect(res2.text).toBe(`Found. Redirecting to ${genres[0].url}`);
+    expect(await Genre.countDocuments()).toBe(1);
+
+    const res3 = await request(app).post("/genres/create");
+
+    expect(res3.status).toBe(400);
+    expect(res3.body.genre).toStrictEqual({ name: "" });
+    expect(res3.body.errors.length).toBe(1);
+    expect(res3.body.errors[0]).toStrictEqual({
+      location: "body",
+      msg: "Genre name required",
+      param: "name",
+      value: "",
+    });
+
+    const res4 = await request(app)
+      .post("/genres/create")
+      .send({ _id: "foobar", name: "Fantasy" });
+
+    expect(res4.status).toBe(500);
+    expect(res4.body.name).toBe("CastError");
   });
 });

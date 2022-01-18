@@ -5,13 +5,14 @@ import request from "supertest";
 import { testMongoURL } from "../utils";
 import Author from "../models/author";
 import Book from "../models/book";
-import { authorListApi, authorDetailApi } from "./authorApi";
+import { authorListApi, authorDetailApi, authorCreateApi } from "./authorApi";
 
 describe("test author APIs", () => {
   const app = express();
   app.use(express.json());
   app.get("/authors", authorListApi);
   app.get("/author/:id", authorDetailApi);
+  app.post("/authors/create", authorCreateApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
@@ -69,5 +70,93 @@ describe("test author APIs", () => {
 
     expect(res3.status).toBe(500);
     expect(res3.body.name).toBe("CastError");
+  });
+
+  test("POST /authors/create", async () => {
+    const res = await request(app)
+      .post("/authors/create")
+      .send({
+        firstName: "     John     ",
+        familyName: "Doe",
+        dateOfBirth: new Date("1970-01-01"),
+        dateOfDeath: new Date("2021-12-31"),
+      });
+
+    expect(res.status).toBe(302);
+
+    const authors = await Author.find();
+
+    expect(authors.length).toBe(1);
+    expect(authors[0].name).toBe("John, Doe");
+    expect(authors[0].lifespan).toBe("Jan 1, 1970 - Dec 31, 2021");
+    expect(res.text).toBe(`Found. Redirecting to ${authors[0].url}`);
+
+    const res2 = await request(app).post("/authors/create");
+
+    expect(res2.status).toBe(400);
+    expect(res2.body.author).toStrictEqual({
+      firstName: "",
+      familyName: "",
+    });
+    expect(res2.body.errors.length).toBe(4);
+    expect(res2.body.errors[0]).toStrictEqual({
+      location: "body",
+      msg: "First name must be specified.",
+      param: "firstName",
+      value: "",
+    });
+    expect(res2.body.errors[1]).toStrictEqual({
+      location: "body",
+      msg: "First name has non-alphanumeric characters.",
+      param: "firstName",
+      value: "",
+    });
+    expect(res2.body.errors[2]).toStrictEqual({
+      location: "body",
+      msg: "Family name must be specified.",
+      param: "familyName",
+      value: "",
+    });
+    expect(res2.body.errors[3]).toStrictEqual({
+      location: "body",
+      msg: "Family name has non-alphanumeric characters.",
+      param: "familyName",
+      value: "",
+    });
+
+    const res3 = await request(app).post("/authors/create").send({
+      firstName: "Invalid firstName.",
+      familyName: "Doe",
+      dateOfBirth: "INVALID",
+    });
+
+    expect(res3.status).toBe(400);
+    expect(res3.body.author).toStrictEqual({
+      firstName: "Invalid firstName.",
+      familyName: "Doe",
+      dateOfBirth: null,
+    });
+    expect(res3.body.errors.length).toBe(2);
+    expect(res3.body.errors[0]).toStrictEqual({
+      location: "body",
+      msg: "First name has non-alphanumeric characters.",
+      param: "firstName",
+      value: "Invalid firstName.",
+    });
+    expect(res3.body.errors[1]).toStrictEqual({
+      location: "body",
+      msg: "Invalid date of birth",
+      param: "dateOfBirth",
+      value: "INVALID",
+    });
+
+    const res4 = await request(app).post("/authors/create").send({
+      _id: "foobar",
+      firstName: "John",
+      familyName: "Doe",
+    });
+
+    expect(res4.status).toBe(500);
+    expect(res4.body.name).toBe("ValidationError");
   });
 });

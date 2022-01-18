@@ -1,5 +1,6 @@
 // apis/bookApi.ts
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import { body, validationResult } from "express-validator";
 import Author from "../models/author";
 import Book from "../models/book";
 import BookInstance from "../models/bookInstance";
@@ -53,3 +54,54 @@ export const bookDetailApi = async (req: Request, res: Response) => {
     return res.status(500).json(err);
   }
 };
+
+export const bookCreateGetApi = async (req: Request, res: Response) => {
+  const [authors, genres] = await Promise.all([
+    Author.find().sort({ familyName: 1 }),
+    Genre.find(),
+  ]);
+  return res.json({ authors, genres });
+};
+
+export const bookCreateApi = [
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!(req.body.genre instanceof Array)) {
+      req.body.genre = req.body.genre === undefined ? [] : [req.body.genre];
+    }
+    return next();
+  },
+
+  body("title", "Title must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("author", "Author must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("summary", "Summary must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("isbn", "ISBN must not be empty").trim().isLength({ min: 1 }).escape(),
+  body("genre.*").escape(),
+
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const [authors, genres] = await Promise.all([
+        Author.find().sort({ familyName: 1 }),
+        Genre.find(),
+      ]);
+      return res
+        .status(400)
+        .json({ authors, genres, book: req.body, errors: errors.array() });
+    }
+    try {
+      const book = await Book.create(req.body);
+      return res.redirect(book.url);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  },
+];
