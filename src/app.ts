@@ -4,6 +4,7 @@ import express, { Request, Response, NextFunction } from "express";
 import createError, { HttpError } from "http-errors";
 import { connect } from "mongoose";
 import logger from "morgan";
+import catalogRouter from "./routes/catalog";
 import indexRouter from "./routes";
 
 const app = express();
@@ -32,6 +33,7 @@ app.use(logger("dev"));
 
 // Setup routers.
 app.use(indexRouter);
+app.use("/catalog", catalogRouter);
 
 // Setup error handler.
 app.use((req, res, next) => {
