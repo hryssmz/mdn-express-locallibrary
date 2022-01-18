@@ -1,8 +1,9 @@
 // app.ts
 import path from "path";
 import express, { Request, Response, NextFunction } from "express";
-import { connect } from "mongoose";
 import createError, { HttpError } from "http-errors";
+import { connect } from "mongoose";
+import logger from "morgan";
 import indexRouter from "./routes";
 
 const app = express();
@@ -25,6 +26,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // Setup static assets.
 app.use(express.static(path.join(__dirname, "..", "public")));
+
+// Setup logger.
+app.use(logger("dev"));
 
 // Setup routers.
 app.use(indexRouter);

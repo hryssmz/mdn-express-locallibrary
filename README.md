@@ -117,3 +117,10 @@ npm install pug
 npm install http-errors
 npm install -D @types/http-errors
 ```
+
+#### 2.3.5. morgan
+
+```bash
+npm install morgan
+npm install -D @types/morgan
+```
