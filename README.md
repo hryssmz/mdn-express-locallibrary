@@ -89,3 +89,12 @@ npm install -D supertest @types/supertest
 ```bash
 npm install -D nodemon
 ```
+
+### 2.3. Initialize Express Project
+
+#### 2.3.1. Express
+
+```bash
+npm install express
+npm install -D @types/express
+```

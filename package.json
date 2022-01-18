@@ -4,6 +4,9 @@
   "description": "A simple Express local library app provided by MDN.",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "lint": "tsc --noEmit -p tsconfig.json && eslint --max-warnings=0 .",
     "test": "jest",
     "prepare": "husky install"
@@ -19,6 +22,7 @@
     "@babel/preset-env": "^7.16.8",
     "@babel/preset-typescript": "^7.16.7",
     "@prettier/plugin-pug": "^1.19.1",
+    "@types/express": "^4.17.13",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.9",
     "@types/supertest": "^2.0.11",
@@ -37,5 +41,8 @@
     "prettier-plugin-sh": "^0.8.1",
     "supertest": "^6.2.1",
     "ts-node": "^10.4.0"
+  },
+  "dependencies": {
+    "express": "^4.17.2"
   }
 }
