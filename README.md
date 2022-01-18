@@ -83,3 +83,9 @@ npm install -D babel-jest @babel/core @babel/preset-env @babel/preset-typescript
 ```bash
 npm install -D supertest @types/supertest
 ```
+
+#### 2.2.9. nodemon
+
+```bash
+npm install -D nodemon
+```
