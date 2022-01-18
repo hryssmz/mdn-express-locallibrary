@@ -5,7 +5,13 @@ import request from "supertest";
 import { testMongoURL } from "../utils";
 import Book from "../models/book";
 import Genre from "../models/genre";
-import { genreListApi, genreDetailApi, genreCreateApi } from "./genreApi";
+import {
+  genreListApi,
+  genreDetailApi,
+  genreCreateApi,
+  genreUpdateGetApi,
+  genreUpdateApi,
+} from "./genreApi";
 
 describe("test genre APIs", () => {
   const app = express();
@@ -13,6 +19,8 @@ describe("test genre APIs", () => {
   app.get("/genres", genreListApi);
   app.get("/genre/:id", genreDetailApi);
   app.post("/genres/create", genreCreateApi);
+  app.get("/genre/:id/update", genreUpdateGetApi);
+  app.post("/genre/:id/update", genreUpdateApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
@@ -104,5 +112,73 @@ describe("test genre APIs", () => {
 
     expect(res4.status).toBe(500);
     expect(res4.body.name).toBe("CastError");
+  });
+
+  test("GET /genre/:id/update", async () => {
+    const genre = await Genre.create({ name: "Fantasy" });
+    const res = await request(app).get(`/genre/${genre._id}/update`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.genre._id).toBe(String(genre._id));
+
+    const res2 = await request(app).get(
+      `/genre/${new Types.ObjectId()}/update`
+    );
+
+    expect(res2.status).toBe(404);
+    expect(res2.body).toBe("Genre not found");
+
+    const res3 = await request(app).get("/genre/foobar/update");
+
+    expect(res3.status).toBe(500);
+    expect(res3.body.name).toBe("CastError");
+  });
+
+  test("POST /genre/:id/update", async () => {
+    const genre = await Genre.create({ name: "Fantasy" });
+    const res = await request(app)
+      .post(`/genre/${genre._id}/update`)
+      .send({ name: "     History     " });
+
+    expect(res.status).toBe(302);
+    expect(res.text).toBe(`Found. Redirecting to ${genre.url}`);
+
+    const genres = await Genre.find();
+
+    expect(genres.length).toBe(1);
+    expect(genres[0].name).toBe("History");
+
+    const res2 = await request(app).post(`/genre/${genre._id}/update`);
+
+    expect(res2.status).toBe(400);
+    expect(res2.body.genre).toStrictEqual({ name: "" });
+    expect(res2.body.errors.length).toBe(1);
+    expect(res2.body.errors[0]).toStrictEqual({
+      location: "body",
+      msg: "Genre name required",
+      param: "name",
+      value: "",
+    });
+
+    const res3 = await request(app)
+      .post(`/genre/${genre._id}/update`)
+      .send({ _id: "foobar", name: "Fantasy" });
+
+    expect(res3.status).toBe(500);
+    expect(res3.body.name).toBe("CastError");
+
+    const res4 = await request(app)
+      .post(`/genre/${new Types.ObjectId()}/update`)
+      .send({ name: "Essay" });
+
+    expect(res4.status).toBe(404);
+    expect(res4.body).toBe("Genre not found");
+
+    const res5 = await request(app)
+      .post("/genre/foobar/update")
+      .send({ name: "Essay" });
+
+    expect(res5.status).toBe(500);
+    expect(res5.body.name).toBe("CastError");
   });
 });

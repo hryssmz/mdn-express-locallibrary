@@ -105,3 +105,65 @@ export const bookCreateApi = [
     }
   },
 ];
+
+export const bookUpdateGetApi = async (req: Request, res: Response) => {
+  try {
+    const [book, authors, genres] = await Promise.all([
+      Book.findById(req.params.id),
+      Author.find().sort({ familyName: 1 }),
+      Genre.find(),
+    ]);
+    if (book === null) {
+      return res.status(404).json("Book not found");
+    }
+    return res.json({ authors, genres, book });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+export const bookUpdateApi = [
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!(req.body.genre instanceof Array)) {
+      req.body.genre = req.body.genre === undefined ? [] : [req.body.genre];
+    }
+    return next();
+  },
+
+  body("title", "Title must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("author", "Author must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("summary", "Summary must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("isbn", "ISBN must not be empty").trim().isLength({ min: 1 }).escape(),
+  body("genre.*").escape(),
+
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const [authors, genres] = await Promise.all([
+        Author.find().sort({ familyName: 1 }),
+        Genre.find(),
+      ]);
+      return res
+        .status(400)
+        .json({ authors, genres, book: req.body, errors: errors.array() });
+    }
+    try {
+      const book = await Book.findByIdAndUpdate(req.params.id, req.body);
+      if (book === null) {
+        return res.status(404).json("Book not found");
+      }
+      return res.redirect(book.url);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  },
+];

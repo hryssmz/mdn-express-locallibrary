@@ -45,3 +45,35 @@ export const genreCreateApi = [
     }
   },
 ];
+
+export const genreUpdateGetApi = async (req: Request, res: Response) => {
+  try {
+    const genre = await Genre.findById(req.params.id);
+    if (genre === null) {
+      return res.status(404).json("Genre not found");
+    }
+    return res.json({ genre });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+export const genreUpdateApi = [
+  body("name", "Genre name required").trim().isLength({ min: 1 }).escape(),
+
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ genre: req.body, errors: errors.array() });
+    }
+    try {
+      const genre = await Genre.findByIdAndUpdate(req.params.id, req.body);
+      if (genre === null) {
+        return res.status(404).json("Genre not found");
+      }
+      return res.redirect(genre.url);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+];

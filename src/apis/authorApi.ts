@@ -61,3 +61,56 @@ export const authorCreateApi = [
     }
   },
 ];
+
+export const authorUpdateGetApi = async (req: Request, res: Response) => {
+  try {
+    const author = await Author.findById(req.params.id);
+    if (author === null) {
+      return res.status(404).json("Author not found");
+    }
+    return res.json({ author });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+export const authorUpdateApi = [
+  body("firstName")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("First name must be specified.")
+    .isAlphanumeric()
+    .withMessage("First name has non-alphanumeric characters."),
+  body("familyName")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("Family name must be specified.")
+    .isAlphanumeric()
+    .withMessage("Family name has non-alphanumeric characters."),
+  body("dateOfBirth", "Invalid date of birth")
+    .optional({ checkFalsy: true })
+    .isISO8601()
+    .toDate(),
+  body("dateOfDeath", "Invalid date of death")
+    .optional({ checkFalsy: true })
+    .isISO8601()
+    .toDate(),
+
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ author: req.body, errors: errors.array() });
+    }
+    try {
+      const author = await Author.findByIdAndUpdate(req.params.id, req.body);
+      if (author === null) {
+        return res.status(404).json("Author not found");
+      }
+      return res.redirect(author.url);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  },
+];
