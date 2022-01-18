@@ -58,3 +58,9 @@ Add some empty Husky scripts.
 npx husky add .husky/pre-commit "exit 0"
 npx husky add .husky/pre-push "exit 0"
 ```
+
+#### 2.2.5. lint-staged
+
+```bash
+npm install -D lint-staged
+```
