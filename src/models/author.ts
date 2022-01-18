@@ -55,7 +55,7 @@ authorSchema.virtual("lifespan").get(function (this: Author): string {
   return `${dateOfBirth} - ${dateOfDeath}`;
 });
 
-authorSchema.virtual("url").get(function (this: Author): string {
+authorSchema.virtual("url").get(function (this: Author) {
   return `/catalog/author/${this._id}`;
 });
 
