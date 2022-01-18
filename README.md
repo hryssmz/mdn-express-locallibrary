@@ -21,3 +21,12 @@ Execute the following commands to create `package.json`.
 ```bash
 npm init
 ```
+
+### 2.2. Install Development Tools
+
+#### 2.2.1. TypeScript
+
+```bash
+npm install -D ts-node @types/node
+npx tsc --init
+```

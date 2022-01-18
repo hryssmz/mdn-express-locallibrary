@@ -11,5 +11,9 @@
     "url": "https://github.com/hryssmz/mdn-express-locallibrary.git"
   },
   "author": "Hiroyasu Shimizu",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^17.0.9",
+    "ts-node": "^10.4.0"
+  }
 }
