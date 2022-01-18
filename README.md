@@ -30,3 +30,9 @@ npm init
 npm install -D ts-node @types/node
 npx tsc --init
 ```
+
+#### 2.2.2. Prettier
+
+```bash
+npm install -D prettier @prettier/plugin-pug prettier-plugin-sh
+```
