@@ -36,3 +36,10 @@ npx tsc --init
 ```bash
 npm install -D prettier @prettier/plugin-pug prettier-plugin-sh
 ```
+
+#### 2.2.3. ESLint
+
+```bash
+npm install -D eslint eslint-config-prettier eslint-plugin-import
+npm init @eslint/config
+```
