@@ -71,3 +71,9 @@ npm install -D lint-staged
 npm install -D jest @types/jest eslint-plugin-jest
 npx jest --init
 ```
+
+#### 2.2.7. Babel
+
+```bash
+npm install -D babel-jest @babel/core @babel/preset-env @babel/preset-typescript
+```
