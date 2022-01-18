@@ -98,3 +98,9 @@ npm install -D nodemon
 npm install express
 npm install -D @types/express
 ```
+
+#### 2.3.2. Mongoose
+
+```bash
+npm install mongoose
+```

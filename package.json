@@ -43,6 +43,7 @@
     "ts-node": "^10.4.0"
   },
   "dependencies": {
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "mongoose": "^6.1.7"
   }
 }
