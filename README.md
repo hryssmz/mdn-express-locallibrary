@@ -64,3 +64,10 @@ npx husky add .husky/pre-push "exit 0"
 ```bash
 npm install -D lint-staged
 ```
+
+#### 2.2.6. Jest
+
+```bash
+npm install -D jest @types/jest eslint-plugin-jest
+npx jest --init
+```
