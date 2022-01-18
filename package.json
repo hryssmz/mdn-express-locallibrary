@@ -4,12 +4,54 @@
   "description": "A simple Express local library app provided by MDN.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "tsc --noEmit -p tsconfig.json && eslint --max-warnings=0 .",
+    "test": "jest",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/hryssmz/mdn-express-locallibrary.git"
   },
   "author": "Hiroyasu Shimizu",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "express-validator": "^6.14.0",
+    "http-errors": "^2.0.0",
+    "luxon": "^2.3.0",
+    "mongoose": "^6.1.7",
+    "morgan": "^1.10.0",
+    "pug": "^3.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.16.8",
+    "@babel/preset-typescript": "^7.16.7",
+    "@prettier/plugin-pug": "^1.19.1",
+    "@types/express": "^4.17.13",
+    "@types/http-errors": "^1.8.2",
+    "@types/jest": "^27.4.0",
+    "@types/luxon": "^2.0.9",
+    "@types/morgan": "^1.9.3",
+    "@types/node": "^17.0.9",
+    "@types/supertest": "^2.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "babel-jest": "^27.4.6",
+    "eslint": "^8.7.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^25.7.0",
+    "husky": "^7.0.4",
+    "jest": "^27.4.7",
+    "lint-staged": "^12.1.7",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.5.1",
+    "prettier-plugin-sh": "^0.8.1",
+    "supertest": "^6.2.1",
+    "ts-node": "^10.4.0"
+  }
 }

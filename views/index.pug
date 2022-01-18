@@ -1,0 +1,12 @@
+//- views/index.pug
+extends layout
+
+block content
+  h1 Express App
+
+  p= message
+
+  if Object.keys(query).length > 0
+    ul.sidebar-nav
+      each key in Object.keys(query)
+        li= `query[${key}] = ${query[key]}`
