@@ -36,3 +36,20 @@ export const bookListApi = async (req: Request, res: Response) => {
     .populate<{ author: Author }>("author");
   return res.json({ bookList });
 };
+
+export const bookDetailApi = async (req: Request, res: Response) => {
+  try {
+    const [book, bookInstances] = await Promise.all([
+      Book.findById(req.params.id)
+        .populate<{ author: Author }>("author")
+        .populate<{ genre: Genre[] }>("genre"),
+      BookInstance.find({ book: req.params.id }),
+    ]);
+    if (book === null) {
+      return res.status(404).json("Book not found");
+    }
+    return res.json({ book, bookInstances });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

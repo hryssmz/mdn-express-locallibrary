@@ -9,3 +9,17 @@ export const bookInstanceListApi = async (req: Request, res: Response) => {
   );
   return res.json({ bookInstanceList });
 };
+
+export const bookInstanceDetailApi = async (req: Request, res: Response) => {
+  try {
+    const bookInstance = await BookInstance.findById(req.params.id).populate<{
+      book: Book;
+    }>("book");
+    if (bookInstance === null) {
+      return res.status(404).json("Book copy not found");
+    }
+    return res.json({ bookInstance });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
