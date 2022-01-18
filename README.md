@@ -110,3 +110,10 @@ npm install mongoose
 ```bash
 npm install pug
 ```
+
+#### 2.3.4. HTTP errors
+
+```bash
+npm install http-errors
+npm install -D @types/http-errors
+```
