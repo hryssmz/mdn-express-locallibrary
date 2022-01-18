@@ -77,3 +77,9 @@ npx jest --init
 ```bash
 npm install -D babel-jest @babel/core @babel/preset-env @babel/preset-typescript
 ```
+
+#### 2.2.8. supertest
+
+```bash
+npm install -D supertest @types/supertest
+```
