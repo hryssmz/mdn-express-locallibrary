@@ -2,14 +2,14 @@
   "name": "mdn-express-locallibrary",
   "version": "1.0.0",
   "description": "A simple Express local library app provided by MDN.",
-  "main": "index.js",
   "scripts": {
+    "prepare": "husky install",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "tsc --noEmit -p tsconfig.json && eslint --max-warnings=0 .",
-    "test": "jest",
-    "prepare": "husky install"
+    "test": "jest -o --bail --coverage=false --detectOpenHandles",
+    "testAll": "jest --bail --detectOpenHandles"
   },
   "repository": {
     "type": "git",

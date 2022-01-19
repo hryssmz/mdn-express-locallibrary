@@ -139,3 +139,4 @@ npm install -D @types/luxon
 ## 3. ChangeLog
 
 - [`dev/v0`](https://github.com/hryssmz/mdn-express-locallibrary/commit/966326c4740830915d88285d35a073ba85927d9c): Setup for the project
+- [`dev/v1`](https://github.com/hryssmz/mdn-express-locallibrary/commit/9b1ad5d760514b8b36c5dba14dd2264e5818eb7e): Add APIs
