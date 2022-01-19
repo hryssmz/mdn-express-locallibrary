@@ -30,3 +30,10 @@ export const index = async (req: Request, res: Response) => {
     },
   });
 };
+
+export const bookList = async (req: Request, res: Response) => {
+  const bookList = await Book.find({}, "title author")
+    .sort({ title: 1 })
+    .populate<{ author: Author }>("author");
+  return res.render("bookList", { title: "Book List", bookList });
+};
