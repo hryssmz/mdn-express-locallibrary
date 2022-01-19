@@ -62,3 +62,42 @@ export const genreCreate = [
     }
   },
 ];
+export const genreUpdateGet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const genre = await Genre.findById(req.params.id);
+    if (genre === null) {
+      return next(createError(404, "Genre not found"));
+    }
+    return res.render("genreForm", { title: "Update Genre", genre });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const genreUpdate = [
+  body("name", "Genre name required").trim().isLength({ min: 1 }).escape(),
+
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.render("genreForm", {
+        title: "Update Genre",
+        genre: req.body,
+        errors: errors.array(),
+      });
+    }
+    try {
+      const genre = await Genre.findByIdAndUpdate(req.params.id, req.body);
+      if (genre === null) {
+        return next(createError(404, "Genre not found"));
+      }
+      return res.redirect(genre.url);
+    } catch (err) {
+      return next(err);
+    }
+  },
+];

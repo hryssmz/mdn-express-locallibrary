@@ -20,3 +20,7 @@ block content
 
   if bookInstance.status !== "Available"
     p #[strong Due back:] #{ bookInstance.dueBackFormatted }
+
+  hr
+  p
+    a(href=`${bookInstance.url}/update`) Update book instance
