@@ -153,3 +153,35 @@ export const bookInstanceUpdate = [
     }
   },
 ];
+
+export const bookInstanceDeleteGet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const bookInstance = await BookInstance.findById(req.params.id);
+    if (bookInstance === null) {
+      return res.redirect("/catalog/book-instances");
+    }
+    return res.render("bookInstanceDelete", {
+      title: "Delete BookInstance",
+      bookInstance,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const bookInstanceDelete = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await BookInstance.findByIdAndRemove(req.body.bookInstanceId);
+    return res.redirect("/catalog/book-instances");
+  } catch (err) {
+    return next(err);
+  }
+};

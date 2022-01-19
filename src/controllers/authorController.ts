@@ -131,11 +131,58 @@ export const authorUpdate = [
     try {
       const author = await Author.findByIdAndUpdate(req.params.id, req.body);
       if (author === null) {
-        return res.status(404).json("Author not found");
+        return next(createError(404, "Author not found"));
       }
-      return next(createError(404, "Author not found"));
+      return res.redirect(author.url);
     } catch (err) {
       return next(err);
     }
   },
 ];
+
+export const authorDeleteGet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const [author, authorsBooks] = await Promise.all([
+      Author.findById(req.params.id),
+      Book.find({ author: req.params.id }),
+    ]);
+    if (author === null) {
+      return res.redirect("/catalog/authors");
+    }
+    return res.render("authorDelete", {
+      title: "Delete Author",
+      author,
+      authorsBooks,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const authorDelete = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const [author, authorsBooks] = await Promise.all([
+      Author.findById(req.body.authorId),
+      Book.find({ author: req.body.authorId }),
+    ]);
+    if (authorsBooks.length > 0) {
+      return res.render("authorDelete", {
+        title: "Delete Author",
+        author,
+        authorsBooks,
+      });
+    }
+    await Author.findByIdAndRemove(req.body.authorId);
+    return res.redirect("/catalog/authors");
+  } catch (err) {
+    return next(err);
+  }
+};

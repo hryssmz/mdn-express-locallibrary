@@ -190,3 +190,50 @@ export const bookUpdate = [
     }
   },
 ];
+
+export const bookDeleteGet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const [book, bookInstances] = await Promise.all([
+      Book.findById(req.params.id),
+      BookInstance.find({ book: req.params.id }),
+    ]);
+    if (book === null) {
+      return res.redirect("/catalog/books");
+    }
+    return res.render("bookDelete", {
+      title: "Delete Book",
+      book,
+      bookInstances,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const bookDelete = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const [book, bookInstances] = await Promise.all([
+      Book.findById(req.body.bookId),
+      BookInstance.find({ book: req.body.bookId }),
+    ]);
+    if (bookInstances.length > 0) {
+      return res.render("bookDelete", {
+        title: "Delete Book",
+        book,
+        bookInstances,
+      });
+    }
+    await Book.findByIdAndRemove(req.body.bookId);
+    return res.redirect("/catalog/books");
+  } catch (err) {
+    return next(err);
+  }
+};

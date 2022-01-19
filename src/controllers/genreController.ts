@@ -101,3 +101,50 @@ export const genreUpdate = [
     }
   },
 ];
+
+export const genreDeleteGet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const [genre, genreBooks] = await Promise.all([
+      Genre.findById(req.params.id),
+      Book.find({ genre: req.params.id }),
+    ]);
+    if (genre === null) {
+      return res.redirect("/catalog/genres");
+    }
+    return res.render("genreDelete", {
+      title: "Delete Genre",
+      genre,
+      genreBooks,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const genreDelete = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const [genre, genreBooks] = await Promise.all([
+      Genre.findById(req.body.genreId),
+      Book.find({ genre: req.body.genreId }),
+    ]);
+    if (genreBooks.length > 0) {
+      return res.render("genreDelete", {
+        title: "Delete Genre",
+        genre,
+        genreBooks,
+      });
+    }
+    await Genre.findByIdAndRemove(req.body.genreId);
+    return res.redirect("/catalog/genres");
+  } catch (err) {
+    return next(err);
+  }
+};
