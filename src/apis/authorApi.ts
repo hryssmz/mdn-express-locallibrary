@@ -114,3 +114,34 @@ export const authorUpdateApi = [
     }
   },
 ];
+
+export const authorDeleteGetApi = async (req: Request, res: Response) => {
+  try {
+    const [author, authorsBooks] = await Promise.all([
+      Author.findById(req.params.id),
+      Book.find({ author: req.params.id }),
+    ]);
+    if (author === null) {
+      return res.redirect("/catalog/authors");
+    }
+    return res.json({ author, authorsBooks });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+export const authorDeleteApi = async (req: Request, res: Response) => {
+  try {
+    const [author, authorsBooks] = await Promise.all([
+      Author.findById(req.body.authorId),
+      Book.find({ author: req.body.authorId }),
+    ]);
+    if (authorsBooks.length > 0) {
+      return res.json({ author, authorsBooks });
+    }
+    await Author.findByIdAndRemove(req.body.authorId);
+    return res.redirect("/catalog/authors");
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

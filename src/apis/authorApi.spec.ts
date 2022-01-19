@@ -11,6 +11,8 @@ import {
   authorCreateApi,
   authorUpdateGetApi,
   authorUpdateApi,
+  authorDeleteGetApi,
+  authorDeleteApi,
 } from "./authorApi";
 
 describe("test author APIs", () => {
@@ -21,6 +23,8 @@ describe("test author APIs", () => {
   app.post("/authors/create", authorCreateApi);
   app.get("/author/:id/update", authorUpdateGetApi);
   app.post("/author/:id/update", authorUpdateApi);
+  app.get("/author/:id/delete", authorDeleteGetApi);
+  app.post("/author/:id/delete", authorDeleteApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
@@ -303,5 +307,90 @@ describe("test author APIs", () => {
 
     expect(res6.status).toBe(500);
     expect(res6.body.name).toBe("CastError");
+  });
+
+  test("GET /author/:id/delete", async () => {
+    const author = await Author.create({
+      firstName: "John",
+      familyName: "Doe",
+    });
+    const book = await Book.create({
+      title: "The Test Title",
+      author: author._id,
+      summary: "Here's a short summary.",
+      isbn: "1234567890000",
+    });
+    const res = await request(app).get(`/author/${author._id}/delete`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.author._id).toBe(String(author._id));
+    expect(res.body.authorsBooks.length).toBe(1);
+    expect(res.body.authorsBooks[0]._id).toBe(String(book._id));
+
+    const res2 = await request(app).get(
+      `/author/${new Types.ObjectId()}/delete`
+    );
+
+    expect(res2.status).toBe(302);
+    expect(res2.text).toBe("Found. Redirecting to /catalog/authors");
+
+    const res3 = await request(app).get(`/author/foobar/delete`);
+
+    expect(res3.status).toBe(500);
+    expect(res3.body.path).toBe("_id");
+  });
+
+  test("POST /author/:id/delete", async () => {
+    const author = await Author.create({
+      firstName: "John",
+      familyName: "Doe",
+    });
+    const book = await Book.create({
+      title: "The Test Title",
+      author: author._id,
+      summary: "Here's a short summary.",
+      isbn: "1234567890000",
+    });
+
+    expect(await Author.countDocuments()).toBe(1);
+
+    const res = await request(app)
+      .post(`/author/xxxx/delete`)
+      .send({ authorId: author._id });
+
+    expect(res.status).toBe(200);
+    expect(res.body.author._id).toBe(String(author._id));
+    expect(res.body.authorsBooks.length).toBe(1);
+    expect(res.body.authorsBooks[0]._id).toBe(String(book._id));
+    expect(await Author.countDocuments()).toBe(1);
+
+    await Book.deleteMany();
+    const res2 = await request(app).post(`/author/xxxx/delete`);
+
+    expect(res2.status).toBe(302);
+    expect(res2.text).toBe("Found. Redirecting to /catalog/authors");
+
+    const res3 = await request(app)
+      .post(`/author/xxxx/delete`)
+      .send({ authorId: new Types.ObjectId() });
+
+    expect(res3.status).toBe(302);
+    expect(res3.text).toBe("Found. Redirecting to /catalog/authors");
+
+    const res4 = await request(app)
+      .post(`/author/xxxx/delete`)
+      .send({ authorId: "foobar" });
+
+    expect(res4.status).toBe(500);
+    expect(res4.body.name).toBe("CastError");
+    expect(await Author.countDocuments()).toBe(1);
+
+    const res5 = await request(app)
+      .post(`/author/xxxx/delete`)
+      .send({ authorId: author._id });
+
+    expect(res5.status).toBe(302);
+    expect(res5.text).toBe("Found. Redirecting to /catalog/authors");
+    expect(await Author.countDocuments()).toBe(0);
   });
 });

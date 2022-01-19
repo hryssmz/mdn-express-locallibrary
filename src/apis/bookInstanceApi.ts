@@ -128,3 +128,24 @@ export const bookInstanceUpdateApi = [
     }
   },
 ];
+
+export const bookInstanceDeleteGetApi = async (req: Request, res: Response) => {
+  try {
+    const bookInstance = await BookInstance.findById(req.params.id);
+    if (bookInstance === null) {
+      return res.redirect("/catalog/book-instances");
+    }
+    return res.json({ bookInstance });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+export const bookInstanceDeleteApi = async (req: Request, res: Response) => {
+  try {
+    await BookInstance.findByIdAndRemove(req.body.bookInstanceId);
+    return res.redirect("/catalog/book-instances");
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

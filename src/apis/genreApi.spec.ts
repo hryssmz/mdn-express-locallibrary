@@ -11,6 +11,8 @@ import {
   genreCreateApi,
   genreUpdateGetApi,
   genreUpdateApi,
+  genreDeleteGetApi,
+  genreDeleteApi,
 } from "./genreApi";
 
 describe("test genre APIs", () => {
@@ -21,6 +23,8 @@ describe("test genre APIs", () => {
   app.post("/genres/create", genreCreateApi);
   app.get("/genre/:id/update", genreUpdateGetApi);
   app.post("/genre/:id/update", genreUpdateApi);
+  app.get("/genre/:id/delete", genreDeleteGetApi);
+  app.post("/genre/:id/delete", genreDeleteApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
@@ -180,5 +184,86 @@ describe("test genre APIs", () => {
 
     expect(res5.status).toBe(500);
     expect(res5.body.name).toBe("CastError");
+  });
+
+  test("GET /genre/:id/delete", async () => {
+    const genre = await Genre.create({ name: "Fantasy" });
+    const book = await Book.create({
+      title: "The Test Title",
+      author: new Types.ObjectId(),
+      summary: "Here's a short summary.",
+      isbn: "1234567890000",
+      genre: [genre._id],
+    });
+    const res = await request(app).get(`/genre/${genre._id}/delete`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.genre._id).toBe(String(genre._id));
+    expect(res.body.genreBooks.length).toBe(1);
+    expect(res.body.genreBooks[0]._id).toBe(String(book._id));
+
+    const res2 = await request(app).get(
+      `/genre/${new Types.ObjectId()}/delete`
+    );
+
+    expect(res2.status).toBe(302);
+    expect(res2.text).toBe("Found. Redirecting to /catalog/genres");
+
+    const res3 = await request(app).get(`/genre/foobar/delete`);
+
+    expect(res3.status).toBe(500);
+    expect(res3.body.name).toBe("CastError");
+  });
+
+  test("POST /genre/:id/delete", async () => {
+    const genre = await Genre.create({ name: "Fantasy" });
+    const book = await Book.create({
+      title: "The Test Title",
+      author: new Types.ObjectId(),
+      summary: "Here's a short summary.",
+      isbn: "1234567890000",
+      genre: [genre._id],
+    });
+
+    expect(await Genre.countDocuments()).toBe(1);
+
+    const res = await request(app)
+      .post(`/genre/xxxxx/delete`)
+      .send({ genreId: genre._id });
+
+    expect(res.status).toBe(200);
+    expect(res.body.genre._id).toBe(String(genre._id));
+    expect(res.body.genreBooks.length).toBe(1);
+    expect(res.body.genreBooks[0]._id).toBe(String(book._id));
+    expect(await Genre.countDocuments()).toBe(1);
+
+    await Book.deleteMany();
+    const res2 = await request(app).post(`/genre/xxxx/delete`);
+
+    expect(res2.status).toBe(302);
+    expect(res2.text).toBe("Found. Redirecting to /catalog/genres");
+
+    const res3 = await request(app)
+      .post(`/genre/xxxx/delete`)
+      .send({ genreId: new Types.ObjectId() });
+
+    expect(res3.status).toBe(302);
+    expect(res3.text).toBe("Found. Redirecting to /catalog/genres");
+
+    const res4 = await request(app)
+      .post(`/genre/xxxx/delete`)
+      .send({ genreId: "foobar" });
+
+    expect(res4.status).toBe(500);
+    expect(res4.body.name).toBe("CastError");
+    expect(await Genre.countDocuments()).toBe(1);
+
+    const res5 = await request(app)
+      .post(`/genre/xxxx/delete`)
+      .send({ genreId: genre._id });
+
+    expect(res5.status).toBe(302);
+    expect(res5.text).toBe("Found. Redirecting to /catalog/genres");
+    expect(await Genre.countDocuments()).toBe(0);
   });
 });

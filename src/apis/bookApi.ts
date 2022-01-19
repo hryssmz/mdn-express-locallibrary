@@ -167,3 +167,34 @@ export const bookUpdateApi = [
     }
   },
 ];
+
+export const bookDeleteGetApi = async (req: Request, res: Response) => {
+  try {
+    const [book, bookInstances] = await Promise.all([
+      Book.findById(req.params.id),
+      BookInstance.find({ book: req.params.id }),
+    ]);
+    if (book === null) {
+      return res.redirect("/catalog/books");
+    }
+    return res.json({ book, bookInstances });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+export const bookDeleteApi = async (req: Request, res: Response) => {
+  try {
+    const [book, bookInstances] = await Promise.all([
+      Book.findById(req.body.bookId),
+      BookInstance.find({ book: req.body.bookId }),
+    ]);
+    if (bookInstances.length > 0) {
+      return res.json({ book, bookInstances });
+    }
+    await Book.findByIdAndRemove(req.body.bookId);
+    return res.redirect("/catalog/books");
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};

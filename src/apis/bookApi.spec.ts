@@ -15,6 +15,8 @@ import {
   bookCreateApi,
   bookUpdateGetApi,
   bookUpdateApi,
+  bookDeleteGetApi,
+  bookDeleteApi,
 } from "./bookApi";
 
 describe("test book APIs", () => {
@@ -27,6 +29,8 @@ describe("test book APIs", () => {
   app.post("/books/create", bookCreateApi);
   app.get("/book/:id/update", bookUpdateGetApi);
   app.post("/book/:id/update", bookUpdateApi);
+  app.get("/book/:id/delete", bookDeleteGetApi);
+  app.post("/book/:id/delete", bookDeleteApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
@@ -423,5 +427,90 @@ describe("test book APIs", () => {
 
     expect(res6.status).toBe(500);
     expect(res6.body.name).toBe("CastError");
+  });
+
+  test("GET /book/:id/delete", async () => {
+    const book = await Book.create({
+      title: "The Test Title",
+      author: new Types.ObjectId(),
+      summary: "Here's a short summary.",
+      isbn: "1234567890000",
+    });
+    const bookInstance = await BookInstance.create({
+      book: book._id,
+      imprint: "Foo Imprint",
+      status: "Loaned",
+    });
+    const res = await request(app).get(`/book/${book._id}/delete`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.book._id).toBe(String(book._id));
+    expect(res.body.bookInstances.length).toBe(1);
+    expect(res.body.bookInstances[0]._id).toBe(String(bookInstance._id));
+
+    const res2 = await request(app).get(`/book/${new Types.ObjectId()}/delete`);
+
+    expect(res2.status).toBe(302);
+    expect(res2.text).toBe("Found. Redirecting to /catalog/books");
+
+    const res3 = await request(app).get(`/book/foobar/delete`);
+
+    expect(res3.status).toBe(500);
+    expect(res3.body.name).toBe("CastError");
+  });
+
+  test("POST /book/:id/delete", async () => {
+    const book = await Book.create({
+      title: "The Test Title",
+      author: new Types.ObjectId(),
+      summary: "Here's a short summary.",
+      isbn: "1234567890000",
+    });
+    const bookInstance = await BookInstance.create({
+      book: book._id,
+      imprint: "Foo Imprint",
+      status: "Loaned",
+    });
+
+    expect(await Book.countDocuments()).toBe(1);
+
+    const res = await request(app)
+      .post(`/book/xxxx/delete`)
+      .send({ bookId: book._id });
+
+    expect(res.status).toBe(200);
+    expect(res.body.book._id).toBe(String(book._id));
+    expect(res.body.bookInstances.length).toBe(1);
+    expect(res.body.bookInstances[0]._id).toBe(String(bookInstance._id));
+    expect(await Book.countDocuments()).toBe(1);
+
+    await BookInstance.deleteMany();
+    const res2 = await request(app).post(`/book/xxxx/delete`);
+
+    expect(res2.status).toBe(302);
+    expect(res2.text).toBe("Found. Redirecting to /catalog/books");
+
+    const res3 = await request(app)
+      .post(`/book/xxxx/delete`)
+      .send({ bookId: new Types.ObjectId() });
+
+    expect(res3.status).toBe(302);
+    expect(res3.text).toBe("Found. Redirecting to /catalog/books");
+
+    const res4 = await request(app)
+      .post(`/book/xxxx/delete`)
+      .send({ bookId: "foobar" });
+
+    expect(res4.status).toBe(500);
+    expect(res4.body.name).toBe("CastError");
+    expect(await Book.countDocuments()).toBe(1);
+
+    const res5 = await request(app)
+      .post(`/book/xxxx/delete`)
+      .send({ bookId: book._id });
+
+    expect(res5.status).toBe(302);
+    expect(res5.text).toBe("Found. Redirecting to /catalog/books");
+    expect(await Book.countDocuments()).toBe(0);
   });
 });
