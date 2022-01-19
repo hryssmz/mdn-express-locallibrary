@@ -1,36 +1,51 @@
-// apis/bookInstanceApi.ts
+// controllers/bookInstanceController.ts
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
+import createError from "http-errors";
 import Book from "../models/book";
 import BookInstance, { statusChoices } from "../models/bookInstance";
 
-export const bookInstanceListApi = async (req: Request, res: Response) => {
+export const bookInstanceList = async (req: Request, res: Response) => {
   const bookInstanceList = await BookInstance.find().populate<{ book: Book }>(
     "book"
   );
-  return res.json({ bookInstanceList });
+  return res.render("bookInstanceList", {
+    title: "Book Instance List",
+    bookInstanceList,
+  });
 };
 
-export const bookInstanceDetailApi = async (req: Request, res: Response) => {
+export const bookInstanceDetail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const bookInstance = await BookInstance.findById(req.params.id).populate<{
       book: Book;
     }>("book");
     if (bookInstance === null) {
-      return res.status(404).json("Book copy not found");
+      return next(createError(404, "Book copy not found"));
     }
-    return res.json({ bookInstance });
+    return res.render("bookInstanceDetail", {
+      title: `Copy: ${bookInstance.book.title}`,
+      bookInstance,
+    });
   } catch (err) {
-    return res.status(500).json(err);
+    return next(err);
   }
 };
 
-export const bookInstanceCreateGetApi = async (req: Request, res: Response) => {
+export const bookInstanceCreateGet = async (req: Request, res: Response) => {
   const bookList = await Book.find({}, "title").sort({ title: 1 });
-  return res.json({ bookList, statusChoices });
+  return res.render("bookInstanceForm", {
+    title: "Create BookInstance",
+    bookList,
+    statusChoices,
+  });
 };
 
-export const bookInstanceCreateApi = [
+export const bookInstanceCreate = [
   async (req: Request, res: Response, next: NextFunction) => {
     if (req.body.dueBack === "") {
       req.body.dueBack = undefined;
@@ -49,11 +64,12 @@ export const bookInstanceCreateApi = [
     .isISO8601()
     .toDate(),
 
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const bookList = await Book.find({}, "title").sort({ title: 1 });
-      return res.status(400).json({
+      return res.render("bookInstanceForm", {
+        title: "Create BookInstance",
         bookList,
         statusChoices,
         bookInstance: req.body,
@@ -64,27 +80,35 @@ export const bookInstanceCreateApi = [
       const bookInstance = await BookInstance.create(req.body);
       return res.redirect(bookInstance.url);
     } catch (err) {
-      res.status(500).json(err);
+      return next(err);
     }
   },
 ];
-
-export const bookInstanceUpdateGetApi = async (req: Request, res: Response) => {
+export const bookInstanceUpdateGet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const [bookInstance, bookList] = await Promise.all([
       BookInstance.findById(req.params.id),
       Book.find({}, "title").sort({ title: 1 }),
     ]);
     if (bookInstance === null) {
-      return res.status(404).json("BookInstance not found");
+      return next(createError(404, "BookInstance not found"));
     }
-    return res.json({ bookInstance, bookList, statusChoices });
+    return res.render("bookInstanceForm", {
+      title: "Update BookInstance",
+      bookInstance,
+      bookList,
+      statusChoices,
+    });
   } catch (err) {
-    return res.status(500).json(err);
+    return next(err);
   }
 };
 
-export const bookInstanceUpdateApi = [
+export const bookInstanceUpdate = [
   async (req: Request, res: Response, next: NextFunction) => {
     if (req.body.dueBack === "") {
       req.body.dueBack = undefined;
@@ -103,11 +127,12 @@ export const bookInstanceUpdateApi = [
     .isISO8601()
     .toDate(),
 
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const bookList = await Book.find({}, "title").sort({ title: 1 });
-      return res.status(400).json({
+      return res.render("bookInstanceForm", {
+        title: "Update BookInstance",
         bookList,
         statusChoices,
         bookInstance: req.body,
@@ -120,32 +145,43 @@ export const bookInstanceUpdateApi = [
         req.body
       );
       if (bookInstance === null) {
-        return res.status(404).json("BookInstance not found");
+        return next(createError(404, "BookInstance not found"));
       }
       return res.redirect(bookInstance.url);
     } catch (err) {
-      res.status(500).json(err);
+      return next(err);
     }
   },
 ];
 
-export const bookInstanceDeleteGetApi = async (req: Request, res: Response) => {
+export const bookInstanceDeleteGet = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const bookInstance = await BookInstance.findById(req.params.id);
     if (bookInstance === null) {
       return res.redirect("/catalog/book-instances");
     }
-    return res.json({ bookInstance });
+    return res.render("bookInstanceDelete", {
+      title: "Delete BookInstance",
+      bookInstance,
+    });
   } catch (err) {
-    return res.status(500).json(err);
+    return next(err);
   }
 };
 
-export const bookInstanceDeleteApi = async (req: Request, res: Response) => {
+export const bookInstanceDelete = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     await BookInstance.findByIdAndRemove(req.body.bookInstanceId);
     return res.redirect("/catalog/book-instances");
   } catch (err) {
-    return res.status(500).json(err);
+    return next(err);
   }
 };

@@ -1,0 +1,18 @@
+//- views/bookInstanceDelete.pug
+extends layout
+
+block content
+  h1 #{ title }: #{ bookInstance._id }
+
+  p Do you really want to delete this BookInstance?
+
+  form(method="POST", action="")
+    .form-group
+      input#bookInstanceId.form-control(
+        type="hidden",
+        name="bookInstanceId",
+        required,
+        value=bookInstance._id
+      )
+
+      button.btn.btn-primary(type="submit") Delete

@@ -2,11 +2,15 @@
 extends layout
 
 block content
-  h1 Express App
+  h1= title
+  p Welcome to #[em LocalLibrary], a very basic Express website developed as a tutorial example on the Mozilla Developer Network.
 
-  p= message
+  h1 Dynamic content
+  p The library has the following record counts:
 
-  if Object.keys(query).length > 0
-    ul.sidebar-nav
-      each key in Object.keys(query)
-        li= `query[${key}] = ${query[key]}`
+  ul
+    li #[strong Books:] !{ data.bookCount }
+    li #[strong Copies:] !{ data.bookInstanceCount }
+    li #[strong Copies available:] !{ data.bookInstanceAvailableCount }
+    li #[strong Authors:] !{ data.authorCount }
+    li #[strong Genres:] !{ data.genreCount }

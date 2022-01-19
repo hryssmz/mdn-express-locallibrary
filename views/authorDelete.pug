@@ -1,0 +1,32 @@
+//- views/authorDelete.pug
+extends layout
+
+block content
+  h1 #{ title }: #{ author.name }
+  p= author.lifespan
+
+  if authorsBooks.length > 0
+    p #[strong Delete the following books before attempting to delete this author.]
+
+    div(style="margin-left: 20px; margin-top: 20px")
+      h4 Books
+
+      dl
+        each book in authorsBooks
+          dt
+            a(href=book.url) #{ book.title }
+          dd #{ book.summary }
+
+  else
+    p Do you really want to delete this Author?
+
+    form(method="POST", action="")
+      .form-group
+        input#authorId.form-control(
+          type="hidden",
+          name="authorId",
+          required,
+          value=author._id
+        )
+
+        button.btn.btn-primary(type="submit") Delete
