@@ -32,7 +32,7 @@ export const bookInstanceCreateGetApi = async (req: Request, res: Response) => {
 
 export const bookInstanceCreateApi = [
   async (req: Request, res: Response, next: NextFunction) => {
-    if (req.body.dueBack === null) {
+    if (req.body.dueBack === "") {
       req.body.dueBack = undefined;
     }
     return next();
@@ -86,7 +86,7 @@ export const bookInstanceUpdateGetApi = async (req: Request, res: Response) => {
 
 export const bookInstanceUpdateApi = [
   async (req: Request, res: Response, next: NextFunction) => {
-    if (req.body.dueBack === null) {
+    if (req.body.dueBack === "") {
       req.body.dueBack = undefined;
     }
     return next();

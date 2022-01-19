@@ -204,7 +204,7 @@ describe("test bookInstance APIs", () => {
       book: book._id,
       imprint: "Bar Imprint",
       status: "Available",
-      dueBack: null,
+      dueBack: "",
     });
     const bookInstance2 = await BookInstance.findOne({
       imprint: "Bar Imprint",
@@ -378,7 +378,7 @@ describe("test bookInstance APIs", () => {
         book: book._id,
         imprint: "Bar Imprint",
         status: "Available",
-        dueBack: null,
+        dueBack: "",
       });
     expect(res5.status).toBe(302);
 

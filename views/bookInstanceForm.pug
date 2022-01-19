@@ -1,0 +1,58 @@
+//- views/bookInstanceForm.pug
+extends layout
+
+block content
+  h1= title
+
+  form(method="POST", action="")
+    .form-group
+      label(for="book") Book:
+      select#book.form-control(
+        type="select",
+        placeholder="Select book",
+        name="book",
+        required
+      )
+        each book in bookList
+          option(
+            value=book._id,
+            selected=bookInstance && bookInstance.book === String(book._id)
+          ) #{ book.title }
+
+    .form-group
+      label(for="imprint") Imprint:
+      input#imprint.form-control(
+        type="text",
+        placeholder="Publisher and date information",
+        name="imprint",
+        required,
+        value=bookInstance === undefined ? "" : bookInstance.imprint
+      )
+    .form-group
+      label(for="dueBack") Date when book available:
+      input#dueBack.form-control(
+        type="date",
+        name="dueBack",
+        value=bookInstance === undefined ? "" : bookInstance.dueBackISO
+      )
+
+    .form-group
+      label(for="status") Status:
+      select#status.form-control(
+        type="select",
+        placeholder="Select status",
+        name="status",
+        required
+      )
+        each choice in statusChoices
+          option(
+            value=choice,
+            selected=bookInstance && bookInstance.status === choice
+          ) #{ choice }
+
+    button.btn.btn-primary(type="submit") Submit
+
+  if errors
+    ul
+      each error in errors
+        li= error.msg

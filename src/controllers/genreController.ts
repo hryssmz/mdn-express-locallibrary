@@ -1,5 +1,6 @@
 // controllers/genreController.ts
 import { Request, Response, NextFunction } from "express";
+import { body, validationResult } from "express-validator";
 import createError from "http-errors";
 import Book from "../models/book";
 import Genre from "../models/genre";
@@ -31,3 +32,33 @@ export const genreDetail = async (
     return next(err);
   }
 };
+
+export async function genreCreateGet(req: Request, res: Response) {
+  return res.render("genreForm", { title: "Create Genre" });
+}
+
+export const genreCreate = [
+  body("name", "Genre name required").trim().isLength({ min: 1 }).escape(),
+
+  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.render("genreForm", {
+        title: "Create Genre",
+        genre: req.body,
+        errors: errors.array(),
+      });
+    }
+    try {
+      const foundGenre = await Genre.findOne(req.body);
+      if (foundGenre !== null) {
+        // Genre exists, redirect to its detail page.
+        return res.redirect(foundGenre.url);
+      }
+      const genre = await Genre.create(req.body);
+      return res.redirect(genre.url);
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
