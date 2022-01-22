@@ -3,8 +3,8 @@ import { connection, connect } from "mongoose";
 import { testMongoURL } from "../utils";
 import Author from "./author";
 
-describe("test Author model", () => {
-  test("valid authors", () => {
+describe("valid Author documents", () => {
+  test("author will full valid fields", () => {
     const author = new Author({
       firstName: "John",
       familyName: "Doe",
@@ -12,45 +12,53 @@ describe("test Author model", () => {
       dateOfDeath: new Date("2020-12-31"),
     });
 
+    // virtuals
     expect(author.name).toBe("John, Doe");
     expect(author.dateOfBirthISO).toBe("1970-01-01");
     expect(author.dateOfDeathISO).toBe("2020-12-31");
     expect(author.lifespan).toBe("Jan 1, 1970 - Dec 31, 2020");
     expect(author.url).toBe(`/catalog/author/${author._id}`);
-
-    const author2 = new Author({ firstName: "John", familyName: "" });
-
-    expect(author2.dateOfBirth).toBeUndefined();
-    expect(author2.dateOfDeath).toBeUndefined();
-    expect(author2.name).toBe("");
-    expect(author2.dateOfBirthISO).toBe("");
-    expect(author2.dateOfDeathISO).toBe("");
-    expect(author2.lifespan).toBe(" - ");
   });
 
-  test("invalid authors", () => {
+  test("author without dates and with an empty family name", () => {
+    const author = new Author({ firstName: "John", familyName: "" });
+
+    expect(author.dateOfBirth).toBeUndefined();
+    expect(author.dateOfDeath).toBeUndefined();
+    // virtuals
+    expect(author.name).toBe("");
+    expect(author.dateOfBirthISO).toBe("");
+    expect(author.dateOfDeathISO).toBe("");
+    expect(author.lifespan).toBe(" - ");
+  });
+});
+
+describe("invalid Author documents", () => {
+  test("author without name", () => {
     const author = new Author();
     const errors = author.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(2);
     expect(errors.firstName.message).toBe("Path `firstName` is required.");
     expect(errors.familyName.message).toBe("Path `familyName` is required.");
+  });
 
-    const author2 = new Author({
+  test("author with a very long name", () => {
+    const author = new Author({
       firstName: Array(200).join("a"),
       familyName: Array(200).join("b"),
     });
-    const errors2 = author2.validateSync()?.errors ?? {};
+    const errors = author.validateSync()?.errors ?? {};
 
-    expect(Object.keys(errors2).length).toBe(2);
-    expect(errors2.firstName.message).toBe(
+    expect(Object.keys(errors).length).toBe(2);
+    expect(errors.firstName.message).toBe(
       "Path `firstName` (`" +
-        author2.firstName +
+        author.firstName +
         "`) is longer than the maximum allowed length (100)."
     );
-    expect(errors2.familyName.message).toBe(
+    expect(errors.familyName.message).toBe(
       "Path `familyName` (`" +
-        author2.familyName +
+        author.familyName +
         "`) is longer than the maximum allowed length (100)."
     );
   });
@@ -75,12 +83,15 @@ describe("test DB interactions", () => {
       firstName: "John",
       familyName: "Doe",
       dateOfBirth: new Date("1970-01-01"),
-      dateOfDeath: new Date("2020-12-31"),
     });
     const authors = await Author.find();
 
     expect(authors.length).toBe(1);
     expect(authors[0]._id).toStrictEqual(author._id);
+    expect(authors[0].firstName).toStrictEqual(author.firstName);
+    expect(authors[0].familyName).toStrictEqual(author.familyName);
+    expect(authors[0].dateOfBirth).toStrictEqual(author.dateOfBirth);
+    expect(authors[0].dateOfDeath).toBeUndefined();
   });
 
   test("does not save to DB if validation failed", async () => {
