@@ -91,11 +91,11 @@ describe("invalid requests", () => {
 
     expect(res.body.errors).toStrictEqual({
       firstName: {
-        msg: "First name must be 1 to 100 chars long.",
+        msg: "First name must be specified.",
         value: "",
       },
       familyName: {
-        msg: "Family name must be 1 to 100 chars long.",
+        msg: "Family name must be specified.",
         value: "",
       },
     });
@@ -112,11 +112,11 @@ describe("invalid requests", () => {
 
     expect(res.body.errors).toStrictEqual({
       firstName: {
-        msg: "First name must be 1 to 100 chars long.",
+        msg: "First name must be at most 100 chars long.",
         value: firstName,
       },
       familyName: {
-        msg: "Family name must be 1 to 100 chars long.",
+        msg: "Family name must be at most 100 chars long.",
         value: familyName,
       },
     });

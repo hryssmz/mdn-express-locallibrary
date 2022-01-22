@@ -111,13 +111,13 @@ describe("authorCreateApi", () => {
     expect(res.body.errors).toStrictEqual({
       firstName: {
         location: "body",
-        msg: "First name must be 1 to 100 chars long.",
+        msg: "First name must be specified.",
         param: "firstName",
         value: "",
       },
       familyName: {
         location: "body",
-        msg: "Family name must be 1 to 100 chars long.",
+        msg: "Family name must be specified.",
         param: "familyName",
         value: "",
       },
@@ -208,13 +208,13 @@ describe("authorUpdateApi", () => {
     expect(res.body.errors).toStrictEqual({
       firstName: {
         location: "body",
-        msg: "First name must be 1 to 100 chars long.",
+        msg: "First name must be specified.",
         param: "firstName",
         value: "",
       },
       familyName: {
         location: "body",
-        msg: "Family name must be 1 to 100 chars long.",
+        msg: "Family name must be specified.",
         param: "familyName",
         value: "",
       },

@@ -6,10 +6,15 @@ export const authorValidator = checkSchema({
     in: ["body"],
     trim: true,
     escape: true,
+    isEmpty: {
+      bail: true,
+      negated: true,
+      errorMessage: "First name must be specified.",
+    },
     isLength: {
       bail: true,
-      errorMessage: "First name must be 1 to 100 chars long.",
-      options: { min: 1, max: 100 },
+      errorMessage: "First name must be at most 100 chars long.",
+      options: { max: 100 },
     },
     isAlphanumeric: {
       bail: true,
@@ -20,10 +25,15 @@ export const authorValidator = checkSchema({
     in: ["body"],
     trim: true,
     escape: true,
+    isEmpty: {
+      bail: true,
+      negated: true,
+      errorMessage: "Family name must be specified.",
+    },
     isLength: {
       bail: true,
-      errorMessage: "Family name must be 1 to 100 chars long.",
-      options: { min: 1, max: 100 },
+      errorMessage: "Family name must be at most 100 chars long.",
+      options: { max: 100 },
     },
     isAlphanumeric: {
       bail: true,
