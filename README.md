@@ -8,7 +8,7 @@ A simple Express local library app provided by MDN.
 
 ```bash
 git clone https://github.com/hryssmz/mdn-express-locallibrary.git
-cd mdn-express-locallibrary.git
+cd mdn-express-locallibrary
 npm install
 
 # Start development mode.
