@@ -1,6 +1,7 @@
 // controllers/genreController.ts
 import { Request, Response, NextFunction } from "express";
-import { body, validationResult } from "express-validator";
+import { validationResult } from "express-validator";
+import { genreValidator } from "../validators/genreValidator";
 import createError from "http-errors";
 import Book from "../models/book";
 import Genre from "../models/genre";
@@ -37,31 +38,33 @@ export async function genreCreateGet(req: Request, res: Response) {
   return res.render("genreForm", { title: "Create Genre" });
 }
 
-export const genreCreate = [
-  body("name", "Genre name required").trim().isLength({ min: 1 }).escape(),
+export const genreCreate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  await genreValidator.run(req);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.render("genreForm", {
+      title: "Create Genre",
+      genre: req.body,
+      errors: errors.mapped(),
+    });
+  }
+  try {
+    const foundGenre = await Genre.findOne(req.body);
+    if (foundGenre !== null) {
+      // Genre exists, redirect to its detail page.
+      return res.redirect(foundGenre.url);
+    }
+    const genre = await Genre.create(req.body);
+    return res.redirect(genre.url);
+  } catch (err) {
+    return next(err);
+  }
+};
 
-  async (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.render("genreForm", {
-        title: "Create Genre",
-        genre: req.body,
-        errors: errors.array(),
-      });
-    }
-    try {
-      const foundGenre = await Genre.findOne(req.body);
-      if (foundGenre !== null) {
-        // Genre exists, redirect to its detail page.
-        return res.redirect(foundGenre.url);
-      }
-      const genre = await Genre.create(req.body);
-      return res.redirect(genre.url);
-    } catch (err) {
-      return next(err);
-    }
-  },
-];
 export const genreUpdateGet = async (
   req: Request,
   res: Response,
@@ -78,29 +81,30 @@ export const genreUpdateGet = async (
   }
 };
 
-export const genreUpdate = [
-  body("name", "Genre name required").trim().isLength({ min: 1 }).escape(),
-
-  async (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.render("genreForm", {
-        title: "Update Genre",
-        genre: req.body,
-        errors: errors.array(),
-      });
+export const genreUpdate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  await genreValidator.run(req);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.render("genreForm", {
+      title: "Update Genre",
+      genre: req.body,
+      errors: errors.mapped(),
+    });
+  }
+  try {
+    const genre = await Genre.findByIdAndUpdate(req.params.id, req.body);
+    if (genre === null) {
+      return next(createError(404, "Genre not found"));
     }
-    try {
-      const genre = await Genre.findByIdAndUpdate(req.params.id, req.body);
-      if (genre === null) {
-        return next(createError(404, "Genre not found"));
-      }
-      return res.redirect(genre.url);
-    } catch (err) {
-      return next(err);
-    }
-  },
-];
+    return res.redirect(genre.url);
+  } catch (err) {
+    return next(err);
+  }
+};
 
 export const genreDeleteGet = async (
   req: Request,

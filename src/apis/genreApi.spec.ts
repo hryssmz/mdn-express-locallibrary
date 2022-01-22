@@ -17,17 +17,17 @@ import {
 
 describe("test genre APIs", () => {
   const app = express();
-  app.use(express.json());
-  app.get("/genres", genreListApi);
-  app.get("/genre/:id", genreDetailApi);
-  app.post("/genres/create", genreCreateApi);
-  app.get("/genre/:id/update", genreUpdateGetApi);
-  app.post("/genre/:id/update", genreUpdateApi);
-  app.get("/genre/:id/delete", genreDeleteGetApi);
-  app.post("/genre/:id/delete", genreDeleteApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
+    app.use(express.json());
+    app.get("/genres", genreListApi);
+    app.get("/genre/:id", genreDetailApi);
+    app.post("/genres/create", genreCreateApi);
+    app.get("/genre/:id/update", genreUpdateGetApi);
+    app.post("/genre/:id/update", genreUpdateApi);
+    app.get("/genre/:id/delete", genreDeleteGetApi);
+    app.post("/genre/:id/delete", genreDeleteApi);
   });
 
   beforeEach(async () => {
@@ -102,8 +102,8 @@ describe("test genre APIs", () => {
 
     expect(res3.status).toBe(400);
     expect(res3.body.genre).toStrictEqual({ name: "" });
-    expect(res3.body.errors.length).toBe(1);
-    expect(res3.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res3.body.errors).length).toBe(1);
+    expect(res3.body.errors.name).toStrictEqual({
       location: "body",
       msg: "Genre name required",
       param: "name",
@@ -156,8 +156,8 @@ describe("test genre APIs", () => {
 
     expect(res2.status).toBe(400);
     expect(res2.body.genre).toStrictEqual({ name: "" });
-    expect(res2.body.errors.length).toBe(1);
-    expect(res2.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res2.body.errors).length).toBe(1);
+    expect(res2.body.errors.name).toStrictEqual({
       location: "body",
       msg: "Genre name required",
       param: "name",

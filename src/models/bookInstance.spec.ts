@@ -5,7 +5,7 @@ import Book from "./book";
 import BookInstance from "./bookInstance";
 
 describe("testing BookInstance model", () => {
-  test("bookInstance with full info", () => {
+  test("valid bookInstances", () => {
     const bookInstance = new BookInstance({
       book: new Types.ObjectId(),
       imprint: "Foo Imprint",
@@ -16,32 +16,28 @@ describe("testing BookInstance model", () => {
     expect(bookInstance.url).toBe(`/catalog/book-instance/${bookInstance._id}`);
     expect(bookInstance.dueBackFormatted).toBe("Jan 1, 2020");
     expect(bookInstance.dueBackISO).toBe("2020-01-01");
-  });
 
-  test("bookInstance without status and dueBack", () => {
-    const bookInstance = new BookInstance({
+    const bookInstance2 = new BookInstance({
       book: new Types.ObjectId(),
       imprint: "Foo Imprint",
     });
 
-    expect(bookInstance.status).toBe("Maintenance");
-    expect(Date.now() - Number(bookInstance.dueBack)).toBeLessThan(10);
-  });
+    expect(bookInstance2.status).toBe("Maintenance");
+    expect(Date.now() - Number(bookInstance2.dueBack)).toBeLessThan(10);
 
-  test("bookInstance with empty dueBack", () => {
-    const bookInstance = new BookInstance({
+    const bookInstance3 = new BookInstance({
       book: new Types.ObjectId(),
       imprint: "Foo Imprint",
       dueBack: "",
     });
 
-    expect(bookInstance.dueBackFormatted).toBe("");
-    expect(bookInstance.dueBackISO).toBe("");
+    expect(bookInstance3.dueBackFormatted).toBe("");
+    expect(bookInstance3.dueBackISO).toBe("");
   });
 
-  test("invalid bookInstance without the required properties", () => {
-    const error = new BookInstance().validateSync();
-    const errors = error ? error.errors : {};
+  test("invalid bookInstances", () => {
+    const bookInstance = new BookInstance();
+    const errors = bookInstance.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(2);
     expect(errors.book.message).toBe("Path `book` is required.");

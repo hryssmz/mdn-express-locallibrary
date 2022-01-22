@@ -6,7 +6,7 @@ import Book from "./book";
 import Genre from "./genre";
 
 describe("test Book model", () => {
-  test("book with full info", () => {
+  test("valid books", () => {
     const book = new Book({
       title: "Some Title",
       author: new Types.ObjectId(),
@@ -16,22 +16,20 @@ describe("test Book model", () => {
     });
 
     expect(book.url).toBe(`/catalog/book/${book._id}`);
-  });
 
-  test("book without genre", () => {
-    const book = new Book({
+    const book2 = new Book({
       title: "Some Title",
       author: new Types.ObjectId(),
       summary: "A short summary.",
       isbn: "1234567890000",
     });
 
-    expect(book.genre).toStrictEqual([]);
+    expect(book2.genre).toStrictEqual([]);
   });
 
-  test("invalid book without the required properties", () => {
-    const error = new Book().validateSync();
-    const errors = error ? error.errors : {};
+  test("invalid books", () => {
+    const book = new Book();
+    const errors = book.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(4);
     expect(errors.title.message).toBe("Path `title` is required.");

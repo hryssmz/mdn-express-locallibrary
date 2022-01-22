@@ -18,18 +18,18 @@ import {
 
 describe("test bookInstance APIs", () => {
   const app = express();
-  app.use(express.json());
-  app.get("/book-instances", bookInstanceListApi);
-  app.get("/book-instance/:id", bookInstanceDetailApi);
-  app.get("/book-instances/create", bookInstanceCreateGetApi);
-  app.post("/book-instances/create", bookInstanceCreateApi);
-  app.get("/book-instance/:id/update", bookInstanceUpdateGetApi);
-  app.post("/book-instance/:id/update", bookInstanceUpdateApi);
-  app.get("/book-instance/:id/delete", bookInstanceDeleteGetApi);
-  app.post("/book-instance/:id/delete", bookInstanceDeleteApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
+    app.use(express.json());
+    app.get("/book-instances", bookInstanceListApi);
+    app.get("/book-instance/:id", bookInstanceDetailApi);
+    app.get("/book-instances/create", bookInstanceCreateGetApi);
+    app.post("/book-instances/create", bookInstanceCreateApi);
+    app.get("/book-instance/:id/update", bookInstanceUpdateGetApi);
+    app.post("/book-instance/:id/update", bookInstanceUpdateApi);
+    app.get("/book-instance/:id/delete", bookInstanceDeleteGetApi);
+    app.post("/book-instance/:id/delete", bookInstanceDeleteApi);
   });
 
   beforeEach(async () => {
@@ -152,14 +152,14 @@ describe("test bookInstance APIs", () => {
       imprint: "",
       status: "",
     });
-    expect(res2.body.errors.length).toBe(2);
-    expect(res2.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res2.body.errors).length).toBe(2);
+    expect(res2.body.errors.book).toStrictEqual({
       location: "body",
       msg: "Book must be specified",
       param: "book",
       value: "",
     });
-    expect(res2.body.errors[1]).toStrictEqual({
+    expect(res2.body.errors.imprint).toStrictEqual({
       location: "body",
       msg: "Imprint must be specified",
       param: "imprint",
@@ -180,8 +180,8 @@ describe("test bookInstance APIs", () => {
       status: "FooBar", // This is currently OK...
       dueBack: null,
     });
-    expect(res3.body.errors.length).toBe(1);
-    expect(res3.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res3.body.errors).length).toBe(1);
+    expect(res3.body.errors.dueBack).toStrictEqual({
       location: "body",
       msg: "Invalid date",
       param: "dueBack",
@@ -319,14 +319,14 @@ describe("test bookInstance APIs", () => {
       imprint: "",
       status: "",
     });
-    expect(res2.body.errors.length).toBe(2);
-    expect(res2.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res2.body.errors).length).toBe(2);
+    expect(res2.body.errors.book).toStrictEqual({
       location: "body",
       msg: "Book must be specified",
       param: "book",
       value: "",
     });
-    expect(res2.body.errors[1]).toStrictEqual({
+    expect(res2.body.errors.imprint).toStrictEqual({
       location: "body",
       msg: "Imprint must be specified",
       param: "imprint",
@@ -349,8 +349,8 @@ describe("test bookInstance APIs", () => {
       status: "FooBar", // This is currently OK...
       dueBack: null,
     });
-    expect(res3.body.errors.length).toBe(1);
-    expect(res3.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res3.body.errors).length).toBe(1);
+    expect(res3.body.errors.dueBack).toStrictEqual({
       location: "body",
       msg: "Invalid date",
       param: "dueBack",

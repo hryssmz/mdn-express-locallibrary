@@ -4,42 +4,36 @@ import { testMongoURL } from "../utils";
 import Genre from "./genre";
 
 describe("test Genre model", () => {
-  test("genre with full info", () => {
+  test("valid genres", () => {
     const genre = new Genre({ name: "Fantasy" });
 
     expect(genre.url).toBe(`/catalog/genre/${genre._id}`);
   });
 
-  test("invalid genre without the required properties", () => {
-    const error = new Genre().validateSync();
-    const errors = error ? error.errors : {};
+  test("invalid genres", () => {
+    const genre = new Genre();
+    const errors = genre.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(1);
     expect(errors.name.message).toBe("Path `name` is required.");
-  });
 
-  test("invalid genre with a short name", () => {
-    const name = "a";
-    const error = new Genre({ name }).validateSync();
-    const errors = error ? error.errors : {};
+    const genre2 = new Genre({ name: "a" });
+    const errors2 = genre2.validateSync()?.errors ?? {};
 
-    expect(Object.keys(errors).length).toBe(1);
-    expect(errors.name.message).toBe(
+    expect(Object.keys(errors2).length).toBe(1);
+    expect(errors2.name.message).toBe(
       "Path `name` (`" +
-        name +
+        genre2.name +
         "`) is shorter than the minimum allowed length (3)."
     );
-  });
 
-  test("invalid genre with a long name", () => {
-    const name = Array(200).join("a");
-    const error = new Genre({ name }).validateSync();
-    const errors = error ? error.errors : {};
+    const genre3 = new Genre({ name: Array(200).join("a") });
+    const errors3 = genre3.validateSync()?.errors ?? {};
 
-    expect(Object.keys(errors).length).toBe(1);
-    expect(errors.name.message).toBe(
+    expect(Object.keys(errors3).length).toBe(1);
+    expect(errors3.name.message).toBe(
       "Path `name` (`" +
-        name +
+        genre3.name +
         "`) is longer than the maximum allowed length (100)."
     );
   });

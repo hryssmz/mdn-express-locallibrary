@@ -21,19 +21,19 @@ import {
 
 describe("test book APIs", () => {
   const app = express();
-  app.use(express.json());
-  app.get("/", indexApi);
-  app.get("/books", bookListApi);
-  app.get("/book/:id", bookDetailApi);
-  app.get("/books/create", bookCreateGetApi);
-  app.post("/books/create", bookCreateApi);
-  app.get("/book/:id/update", bookUpdateGetApi);
-  app.post("/book/:id/update", bookUpdateApi);
-  app.get("/book/:id/delete", bookDeleteGetApi);
-  app.post("/book/:id/delete", bookDeleteApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
+    app.use(express.json());
+    app.get("/", indexApi);
+    app.get("/books", bookListApi);
+    app.get("/book/:id", bookDetailApi);
+    app.get("/books/create", bookCreateGetApi);
+    app.post("/books/create", bookCreateApi);
+    app.get("/book/:id/update", bookUpdateGetApi);
+    app.post("/book/:id/update", bookUpdateApi);
+    app.get("/book/:id/delete", bookDeleteGetApi);
+    app.post("/book/:id/delete", bookDeleteApi);
   });
 
   beforeEach(async () => {
@@ -211,26 +211,26 @@ describe("test book APIs", () => {
       summary: "",
       title: "",
     });
-    expect(res2.body.errors.length).toBe(4);
-    expect(res2.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res2.body.errors).length).toBe(4);
+    expect(res2.body.errors.title).toStrictEqual({
       location: "body",
       msg: "Title must not be empty.",
       param: "title",
       value: "",
     });
-    expect(res2.body.errors[1]).toStrictEqual({
+    expect(res2.body.errors.author).toStrictEqual({
       location: "body",
       msg: "Author must not be empty.",
       param: "author",
       value: "",
     });
-    expect(res2.body.errors[2]).toStrictEqual({
+    expect(res2.body.errors.summary).toStrictEqual({
       location: "body",
       msg: "Summary must not be empty.",
       param: "summary",
       value: "",
     });
-    expect(res2.body.errors[3]).toStrictEqual({
+    expect(res2.body.errors.isbn).toStrictEqual({
       location: "body",
       msg: "ISBN must not be empty",
       param: "isbn",
@@ -353,26 +353,26 @@ describe("test book APIs", () => {
       summary: "",
       title: "",
     });
-    expect(res2.body.errors.length).toBe(4);
-    expect(res2.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res2.body.errors).length).toBe(4);
+    expect(res2.body.errors.title).toStrictEqual({
       location: "body",
       msg: "Title must not be empty.",
       param: "title",
       value: "",
     });
-    expect(res2.body.errors[1]).toStrictEqual({
+    expect(res2.body.errors.author).toStrictEqual({
       location: "body",
       msg: "Author must not be empty.",
       param: "author",
       value: "",
     });
-    expect(res2.body.errors[2]).toStrictEqual({
+    expect(res2.body.errors.summary).toStrictEqual({
       location: "body",
       msg: "Summary must not be empty.",
       param: "summary",
       value: "",
     });
-    expect(res2.body.errors[3]).toStrictEqual({
+    expect(res2.body.errors.isbn).toStrictEqual({
       location: "body",
       msg: "ISBN must not be empty",
       param: "isbn",

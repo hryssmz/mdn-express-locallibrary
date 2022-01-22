@@ -1,6 +1,6 @@
 // scripts/initCatalog.ts
 import { connect, connection } from "mongoose";
-import { mongoURL } from "../src/app";
+import { mongoURL } from "../src/utils";
 import Author from "../src/models/author";
 import Book from "../src/models/book";
 import BookInstance from "../src/models/bookInstance";

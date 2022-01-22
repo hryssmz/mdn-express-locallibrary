@@ -17,17 +17,17 @@ import {
 
 describe("test author APIs", () => {
   const app = express();
-  app.use(express.json());
-  app.get("/authors", authorListApi);
-  app.get("/author/:id", authorDetailApi);
-  app.post("/authors/create", authorCreateApi);
-  app.get("/author/:id/update", authorUpdateGetApi);
-  app.post("/author/:id/update", authorUpdateApi);
-  app.get("/author/:id/delete", authorDeleteGetApi);
-  app.post("/author/:id/delete", authorDeleteApi);
 
   beforeAll(async () => {
     await connect(testMongoURL);
+    app.use(express.json());
+    app.get("/authors", authorListApi);
+    app.get("/author/:id", authorDetailApi);
+    app.post("/authors/create", authorCreateApi);
+    app.get("/author/:id/update", authorUpdateGetApi);
+    app.post("/author/:id/update", authorUpdateApi);
+    app.get("/author/:id/delete", authorDeleteGetApi);
+    app.post("/author/:id/delete", authorDeleteApi);
   });
 
   beforeEach(async () => {
@@ -110,28 +110,16 @@ describe("test author APIs", () => {
       firstName: "",
       familyName: "",
     });
-    expect(res2.body.errors.length).toBe(4);
-    expect(res2.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res2.body.errors).length).toBe(2);
+    expect(res2.body.errors.firstName).toStrictEqual({
       location: "body",
       msg: "First name must be specified.",
       param: "firstName",
       value: "",
     });
-    expect(res2.body.errors[1]).toStrictEqual({
-      location: "body",
-      msg: "First name has non-alphanumeric characters.",
-      param: "firstName",
-      value: "",
-    });
-    expect(res2.body.errors[2]).toStrictEqual({
+    expect(res2.body.errors.familyName).toStrictEqual({
       location: "body",
       msg: "Family name must be specified.",
-      param: "familyName",
-      value: "",
-    });
-    expect(res2.body.errors[3]).toStrictEqual({
-      location: "body",
-      msg: "Family name has non-alphanumeric characters.",
       param: "familyName",
       value: "",
     });
@@ -148,14 +136,14 @@ describe("test author APIs", () => {
       familyName: "Doe",
       dateOfBirth: null,
     });
-    expect(res3.body.errors.length).toBe(2);
-    expect(res3.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res3.body.errors).length).toBe(2);
+    expect(res3.body.errors.firstName).toStrictEqual({
       location: "body",
       msg: "First name has non-alphanumeric characters.",
       param: "firstName",
       value: "Invalid firstName.",
     });
-    expect(res3.body.errors[1]).toStrictEqual({
+    expect(res3.body.errors.dateOfBirth).toStrictEqual({
       location: "body",
       msg: "Invalid date of birth",
       param: "dateOfBirth",
@@ -225,28 +213,16 @@ describe("test author APIs", () => {
       firstName: "",
       familyName: "",
     });
-    expect(res2.body.errors.length).toBe(4);
-    expect(res2.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res2.body.errors).length).toBe(2);
+    expect(res2.body.errors.firstName).toStrictEqual({
       location: "body",
       msg: "First name must be specified.",
       param: "firstName",
       value: "",
     });
-    expect(res2.body.errors[1]).toStrictEqual({
-      location: "body",
-      msg: "First name has non-alphanumeric characters.",
-      param: "firstName",
-      value: "",
-    });
-    expect(res2.body.errors[2]).toStrictEqual({
+    expect(res2.body.errors.familyName).toStrictEqual({
       location: "body",
       msg: "Family name must be specified.",
-      param: "familyName",
-      value: "",
-    });
-    expect(res2.body.errors[3]).toStrictEqual({
-      location: "body",
-      msg: "Family name has non-alphanumeric characters.",
       param: "familyName",
       value: "",
     });
@@ -263,14 +239,14 @@ describe("test author APIs", () => {
       familyName: "Doe",
       dateOfBirth: null,
     });
-    expect(res3.body.errors.length).toBe(2);
-    expect(res3.body.errors[0]).toStrictEqual({
+    expect(Object.keys(res3.body.errors).length).toBe(2);
+    expect(res3.body.errors.firstName).toStrictEqual({
       location: "body",
       msg: "First name has non-alphanumeric characters.",
       param: "firstName",
       value: "Invalid firstName.",
     });
-    expect(res3.body.errors[1]).toStrictEqual({
+    expect(res3.body.errors.dateOfBirth).toStrictEqual({
       location: "body",
       msg: "Invalid date of birth",
       param: "dateOfBirth",
