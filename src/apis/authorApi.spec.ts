@@ -15,32 +15,32 @@ import {
   authorDeleteApi,
 } from "./authorApi";
 
-describe("test author APIs", () => {
-  const app = express();
+const app = express();
 
-  beforeAll(async () => {
-    await connect(testMongoURL);
-    app.use(express.json());
-    app.get("/authors", authorListApi);
-    app.get("/author/:id", authorDetailApi);
-    app.post("/authors/create", authorCreateApi);
-    app.get("/author/:id/update", authorUpdateGetApi);
-    app.post("/author/:id/update", authorUpdateApi);
-    app.get("/author/:id/delete", authorDeleteGetApi);
-    app.post("/author/:id/delete", authorDeleteApi);
-  });
+beforeAll(async () => {
+  await connect(testMongoURL);
+  app.use(express.json());
+  app.get("/authors", authorListApi);
+  app.get("/author/:id", authorDetailApi);
+  app.post("/authors/create", authorCreateApi);
+  app.get("/author/:id/update", authorUpdateGetApi);
+  app.post("/author/:id/update", authorUpdateApi);
+  app.get("/author/:id/delete", authorDeleteGetApi);
+  app.post("/author/:id/delete", authorDeleteApi);
+});
 
-  beforeEach(async () => {
-    await Promise.all([Author.deleteMany(), Book.deleteMany()]);
-  });
+beforeEach(async () => {
+  await Promise.all([Author.deleteMany(), Book.deleteMany()]);
+});
 
-  afterAll(async () => {
-    await Promise.all([Author.deleteMany(), Book.deleteMany()]);
-    await connection.close();
-  });
+afterAll(async () => {
+  await Promise.all([Author.deleteMany(), Book.deleteMany()]);
+  await connection.close();
+});
 
-  test("GET /authors", async () => {
-    const author = await Author.create({
+describe("authorListApi", () => {
+  test("HTTP 200: return author list sorted by family name", async () => {
+    await Author.create({
       firstName: "John",
       familyName: "Doe",
     });
@@ -49,22 +49,46 @@ describe("test author APIs", () => {
       familyName: "Bush",
     });
     const res = await request(app).get("/authors");
+    const familyNames = res.body.authorList.map(
+      (author: Author) => author.familyName
+    );
 
     expect(res.status).toBe(200);
-    expect(res.body.authorList.length).toBe(2);
-    expect(res.body.authorList[1]._id).toBe(String(author._id));
+    expect(familyNames).toStrictEqual(["Bush", "Doe"]);
+  });
+});
+
+describe("authorDetailApi", () => {
+  test("HTTP 404: bad ID provided", async () => {
+    const res = await request(app).get("/author/badObjectId");
+
+    expect(res.status).toBe(404);
+    expect(res.body).toBe("Author not found");
   });
 
-  test("GET /author/:id", async () => {
+  test("HTTP 404: author not found", async () => {
+    const res = await request(app).get(`/author/${new Types.ObjectId()}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body).toBe("Author not found");
+  });
+
+  test("HTTP 200: return author and all her/his books", async () => {
     const author = await Author.create({
       firstName: "John",
       familyName: "Doe",
     });
     const book = await Book.create({
-      title: "The Test Title",
+      title: "John Doe's Book",
       author: author._id,
       summary: "Here's a short summary.",
       isbn: "1234567890000",
+    });
+    await Book.create({
+      title: "Somebody Else's Book",
+      author: new Types.ObjectId(),
+      summary: "Here's another short summary.",
+      isbn: "1234567890001",
     });
     const res = await request(app).get(`/author/${author._id}`);
 
@@ -72,26 +96,41 @@ describe("test author APIs", () => {
     expect(res.body.author._id).toBe(String(author._id));
     expect(res.body.authorsBooks.length).toBe(1);
     expect(res.body.authorsBooks[0]._id).toBe(String(book._id));
+  });
+});
 
-    const res2 = await request(app).get(`/author/${new Types.ObjectId()}`);
+describe("authorCreateApi", () => {
+  test("HTTP 400: return author data and validation errors", async () => {
+    const res = await request(app).post("/authors/create");
 
-    expect(res2.status).toBe(404);
-    expect(res2.body).toBe("Author not found");
-
-    const res3 = await request(app).get("/author/foobar");
-
-    expect(res3.status).toBe(500);
-    expect(res3.body.name).toBe("CastError");
+    expect(res.status).toBe(400);
+    expect(res.body.author).toStrictEqual({
+      firstName: "",
+      familyName: "",
+    });
+    expect(res.body.errors).toStrictEqual({
+      firstName: {
+        location: "body",
+        msg: "First name must be 1 to 100 chars long.",
+        param: "firstName",
+        value: "",
+      },
+      familyName: {
+        location: "body",
+        msg: "Family name must be 1 to 100 chars long.",
+        param: "familyName",
+        value: "",
+      },
+    });
   });
 
-  test("POST /authors/create", async () => {
+  test("HTTP 302: create author and redirect to detail view", async () => {
     const res = await request(app)
       .post("/authors/create")
       .send({
-        firstName: "     John     ",
+        firstName: "  John ",
         familyName: "Doe",
         dateOfBirth: new Date("1970-01-01"),
-        dateOfDeath: new Date("2021-12-31"),
       });
 
     expect(res.status).toBe(302);
@@ -100,67 +139,29 @@ describe("test author APIs", () => {
 
     expect(authors.length).toBe(1);
     expect(authors[0].name).toBe("John, Doe");
-    expect(authors[0].lifespan).toBe("Jan 1, 1970 - Dec 31, 2021");
+    expect(authors[0].lifespan).toBe("Jan 1, 1970 - ");
     expect(res.text).toBe(`Found. Redirecting to ${authors[0].url}`);
+  });
+});
 
-    const res2 = await request(app).post("/authors/create");
+describe("authorUpdateGetApi", () => {
+  test("HTTP 404: bad ID provided", async () => {
+    const res = await request(app).get("/author/badObjectId/update");
 
-    expect(res2.status).toBe(400);
-    expect(res2.body.author).toStrictEqual({
-      firstName: "",
-      familyName: "",
-    });
-    expect(Object.keys(res2.body.errors).length).toBe(2);
-    expect(res2.body.errors.firstName).toStrictEqual({
-      location: "body",
-      msg: "First name must be specified.",
-      param: "firstName",
-      value: "",
-    });
-    expect(res2.body.errors.familyName).toStrictEqual({
-      location: "body",
-      msg: "Family name must be specified.",
-      param: "familyName",
-      value: "",
-    });
-
-    const res3 = await request(app).post("/authors/create").send({
-      firstName: "Invalid firstName.",
-      familyName: "Doe",
-      dateOfBirth: "INVALID",
-    });
-
-    expect(res3.status).toBe(400);
-    expect(res3.body.author).toStrictEqual({
-      firstName: "Invalid firstName.",
-      familyName: "Doe",
-      dateOfBirth: null,
-    });
-    expect(Object.keys(res3.body.errors).length).toBe(2);
-    expect(res3.body.errors.firstName).toStrictEqual({
-      location: "body",
-      msg: "First name has non-alphanumeric characters.",
-      param: "firstName",
-      value: "Invalid firstName.",
-    });
-    expect(res3.body.errors.dateOfBirth).toStrictEqual({
-      location: "body",
-      msg: "Invalid date of birth",
-      param: "dateOfBirth",
-      value: "INVALID",
-    });
-
-    const res4 = await request(app).post("/authors/create").send({
-      _id: "foobar",
-      firstName: "John",
-      familyName: "Doe",
-    });
-
-    expect(res4.status).toBe(500);
-    expect(res4.body.name).toBe("ValidationError");
+    expect(res.status).toBe(404);
+    expect(res.body).toBe("Author not found");
   });
 
-  test("GET /author/:id/update", async () => {
+  test("HTTP 404: author not found", async () => {
+    const res = await request(app).get(
+      `/author/${new Types.ObjectId()}/update`
+    );
+
+    expect(res.status).toBe(404);
+    expect(res.body).toBe("Author not found");
+  });
+
+  test("HTTP 200: return author", async () => {
     const author = await Author.create({
       firstName: "John",
       familyName: "Doe",
@@ -169,30 +170,64 @@ describe("test author APIs", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.author._id).toBe(String(author._id));
+  });
+});
 
-    const res2 = await request(app).get(
+describe("authorUpdateApi", () => {
+  test("HTTP 404: bad ID provided", async () => {
+    const res = await request(app).post("/author/badObjectId/update").send({
+      firstName: "John",
+      familyName: "Doe",
+    });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toBe("Author not found");
+  });
+
+  test("HTTP 404: author not found", async () => {
+    const res = await request(app).post(
       `/author/${new Types.ObjectId()}/update`
     );
 
-    expect(res2.status).toBe(404);
-    expect(res2.body).toBe("Author not found");
-
-    const res3 = await request(app).get("/author/foobar/update");
-
-    expect(res3.status).toBe(500);
-    expect(res3.body.name).toBe("CastError");
+    expect(res.status).toBe(404);
+    expect(res.body).toBe("Author not found");
   });
 
-  test("POST /author/:id/update", async () => {
+  test("HTTP 400: return author data and validation errors", async () => {
     const author = await Author.create({
-      firstName: "Foo",
-      familyName: "Bar",
+      firstName: "John",
+      familyName: "Doe",
     });
+    const res = await request(app).post(`/author/${author._id}/update`);
+
+    expect(res.status).toBe(400);
+    expect(res.body.author).toStrictEqual({
+      firstName: "",
+      familyName: "",
+    });
+    expect(res.body.errors).toStrictEqual({
+      firstName: {
+        location: "body",
+        msg: "First name must be 1 to 100 chars long.",
+        param: "firstName",
+        value: "",
+      },
+      familyName: {
+        location: "body",
+        msg: "Family name must be 1 to 100 chars long.",
+        param: "familyName",
+        value: "",
+      },
+    });
+  });
+
+  test("HTTP 302: update author and redirect to detail view", async () => {
+    const author = await Author.create({ firstName: "Foo", familyName: "Bar" });
 
     const res = await request(app)
       .post(`/author/${author._id}/update`)
       .send({
-        firstName: "     John     ",
+        firstName: "  John ",
         familyName: "Doe",
         dateOfBirth: new Date("1970-01-01"),
       });
@@ -205,96 +240,42 @@ describe("test author APIs", () => {
     expect(authors.length).toBe(1);
     expect(authors[0].name).toBe("John, Doe");
     expect(authors[0].lifespan).toBe("Jan 1, 1970 - ");
+  });
+});
 
-    const res2 = await request(app).post(`/author/${author._id}/update`);
+describe("authorDeleteGetApi", () => {
+  test("HTTP 302: redirect to list view if bad ID provided", async () => {
+    const res = await request(app).get(`/author/badObjectId/delete`);
 
-    expect(res2.status).toBe(400);
-    expect(res2.body.author).toStrictEqual({
-      firstName: "",
-      familyName: "",
-    });
-    expect(Object.keys(res2.body.errors).length).toBe(2);
-    expect(res2.body.errors.firstName).toStrictEqual({
-      location: "body",
-      msg: "First name must be specified.",
-      param: "firstName",
-      value: "",
-    });
-    expect(res2.body.errors.familyName).toStrictEqual({
-      location: "body",
-      msg: "Family name must be specified.",
-      param: "familyName",
-      value: "",
-    });
-
-    const res3 = await request(app).post(`/author/${author._id}/update`).send({
-      firstName: "Invalid firstName.",
-      familyName: "Doe",
-      dateOfBirth: "INVALID",
-    });
-
-    expect(res3.status).toBe(400);
-    expect(res3.body.author).toStrictEqual({
-      firstName: "Invalid firstName.",
-      familyName: "Doe",
-      dateOfBirth: null,
-    });
-    expect(Object.keys(res3.body.errors).length).toBe(2);
-    expect(res3.body.errors.firstName).toStrictEqual({
-      location: "body",
-      msg: "First name has non-alphanumeric characters.",
-      param: "firstName",
-      value: "Invalid firstName.",
-    });
-    expect(res3.body.errors.dateOfBirth).toStrictEqual({
-      location: "body",
-      msg: "Invalid date of birth",
-      param: "dateOfBirth",
-      value: "INVALID",
-    });
-
-    const res4 = await request(app).post(`/author/${author._id}/update`).send({
-      _id: "foobar",
-      firstName: "John",
-      familyName: "Doe",
-    });
-
-    expect(res4.status).toBe(500);
-    expect(res4.body.name).toBe("CastError");
-
-    const res5 = await request(app)
-      .post(`/author/${new Types.ObjectId()}/update`)
-      .send({
-        firstName: "Lily",
-        familyName: "Bush",
-        dateOfDeath: new Date("1970-01-01"),
-      });
-
-    expect(res5.status).toBe(404);
-    expect(res5.body).toBe("Author not found");
-
-    const res6 = await request(app)
-      .post("/author/foobar/update")
-      .send({
-        firstName: "Lily",
-        familyName: "Bush",
-        dateOfDeath: new Date("1970-01-01"),
-      });
-
-    expect(res6.status).toBe(500);
-    expect(res6.body.name).toBe("CastError");
+    expect(res.status).toBe(302);
+    expect(res.text).toBe("Found. Redirecting to /catalog/authors");
   });
 
-  test("GET /author/:id/delete", async () => {
+  test("HTTP 302: redirect to list view if author not found", async () => {
+    const res = await request(app).get(
+      `/author/${new Types.ObjectId()}/delete`
+    );
+
+    expect(res.status).toBe(302);
+    expect(res.text).toBe("Found. Redirecting to /catalog/authors");
+  });
+
+  test("HTTP 200: return author and all her/his books", async () => {
     const author = await Author.create({
       firstName: "John",
       familyName: "Doe",
     });
     const book = await Book.create({
-      title: "The Test Title",
+      title: "John Doe's Book",
       author: author._id,
       summary: "Here's a short summary.",
       isbn: "1234567890000",
+    });
+    await Book.create({
+      title: "Somebody Else's Book",
+      author: new Types.ObjectId(),
+      summary: "Here's another short summary.",
+      isbn: "1234567890001",
     });
     const res = await request(app).get(`/author/${author._id}/delete`);
 
@@ -302,30 +283,42 @@ describe("test author APIs", () => {
     expect(res.body.author._id).toBe(String(author._id));
     expect(res.body.authorsBooks.length).toBe(1);
     expect(res.body.authorsBooks[0]._id).toBe(String(book._id));
+  });
+});
 
-    const res2 = await request(app).get(
-      `/author/${new Types.ObjectId()}/delete`
-    );
+describe("authorDeleteApi", () => {
+  test("HTTP 302: redirect to list view if bad ID provided", async () => {
+    const res = await request(app)
+      .post(`/author/xxxx/delete`)
+      .send({ authorId: "badObjectId" });
 
-    expect(res2.status).toBe(302);
-    expect(res2.text).toBe("Found. Redirecting to /catalog/authors");
-
-    const res3 = await request(app).get(`/author/foobar/delete`);
-
-    expect(res3.status).toBe(500);
-    expect(res3.body.path).toBe("_id");
+    expect(res.status).toBe(302);
+    expect(res.text).toBe("Found. Redirecting to /catalog/authors");
   });
 
-  test("POST /author/:id/delete", async () => {
+  test("HTTP 302: redirect to list view if author not found", async () => {
+    const res = await request(app).post(`/author/xxxx/delete`);
+
+    expect(res.status).toBe(302);
+    expect(res.text).toBe("Found. Redirecting to /catalog/authors");
+  });
+
+  test("HTTP 200: return author and all her/his books without deleting", async () => {
     const author = await Author.create({
       firstName: "John",
       familyName: "Doe",
     });
     const book = await Book.create({
-      title: "The Test Title",
+      title: "John Doe's Book",
       author: author._id,
       summary: "Here's a short summary.",
       isbn: "1234567890000",
+    });
+    await Book.create({
+      title: "Somebody Else's Book",
+      author: new Types.ObjectId(),
+      summary: "Here's another short summary.",
+      isbn: "1234567890001",
     });
 
     expect(await Author.countDocuments()).toBe(1);
@@ -339,34 +332,22 @@ describe("test author APIs", () => {
     expect(res.body.authorsBooks.length).toBe(1);
     expect(res.body.authorsBooks[0]._id).toBe(String(book._id));
     expect(await Author.countDocuments()).toBe(1);
+  });
 
-    await Book.deleteMany();
-    const res2 = await request(app).post(`/author/xxxx/delete`);
+  test("HTTP 302: delete author and redirect to list view", async () => {
+    const author = await Author.create({
+      firstName: "John",
+      familyName: "Doe",
+    });
 
-    expect(res2.status).toBe(302);
-    expect(res2.text).toBe("Found. Redirecting to /catalog/authors");
-
-    const res3 = await request(app)
-      .post(`/author/xxxx/delete`)
-      .send({ authorId: new Types.ObjectId() });
-
-    expect(res3.status).toBe(302);
-    expect(res3.text).toBe("Found. Redirecting to /catalog/authors");
-
-    const res4 = await request(app)
-      .post(`/author/xxxx/delete`)
-      .send({ authorId: "foobar" });
-
-    expect(res4.status).toBe(500);
-    expect(res4.body.name).toBe("CastError");
     expect(await Author.countDocuments()).toBe(1);
 
-    const res5 = await request(app)
+    const res = await request(app)
       .post(`/author/xxxx/delete`)
       .send({ authorId: author._id });
 
-    expect(res5.status).toBe(302);
-    expect(res5.text).toBe("Found. Redirecting to /catalog/authors");
+    expect(res.status).toBe(302);
+    expect(res.text).toBe("Found. Redirecting to /catalog/authors");
     expect(await Author.countDocuments()).toBe(0);
   });
 });

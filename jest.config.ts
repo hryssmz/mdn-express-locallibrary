@@ -21,7 +21,11 @@ export default {
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   // collectCoverageFrom: undefined,
-  collectCoverageFrom: ["src/models/*.ts", "src/apis/*.ts"],
+  collectCoverageFrom: [
+    "src/apis/*.ts",
+    "src/models/*.ts",
+    "src/validators/*.ts",
+  ],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
@@ -159,7 +163,11 @@ export default {
   //   "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   // ],
-  testMatch: ["<rootDir>/src/models/*.spec.ts", "<rootDir>/src/apis/*.spec.ts"],
+  testMatch: [
+    "<rootDir>/src/apis/*.spec.ts",
+    "<rootDir>/src/models/*.spec.ts",
+    "<rootDir>/src/validators/*.spec.ts",
+  ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
