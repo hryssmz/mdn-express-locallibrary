@@ -28,7 +28,7 @@ async function initCatalog() {
 async function initAuthors(): Promise<Author[]> {
   const data: [string, string, string | undefined, string | undefined][] = [
     ["Patrick", "Rothfuss", "1973-06-06", undefined],
-    ["Ben", "Bova", "1932-11-8", undefined],
+    ["Ben", "Bova", "1932-11-08", undefined],
     ["Isaac", "Asimov", "1920-01-02", "1992-04-06"],
     ["Bob", "Billings", undefined, undefined],
     ["Jim", "Jones", "1971-12-16", undefined],
@@ -103,10 +103,10 @@ async function initBooks(authors: Author[], genres: Genre[]): Promise<Book[]> {
       "Test Book 1",
       authors[4],
       "Summary of test book 1",
-      "ISBN111111",
+      "9781234567897",
       [genres[0], genres[1]],
     ],
-    ["Test Book 2", authors[4], "Summary of test book 2", "ISBN222222", []],
+    ["Test Book 2", authors[4], "Summary of test book 2", "9781234567903", []],
   ];
 
   await Book.deleteMany();

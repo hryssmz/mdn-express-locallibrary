@@ -11,7 +11,7 @@ describe("test Book model", () => {
       title: "Some Title",
       author: new Types.ObjectId(),
       summary: "A short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
       genre: [new Types.ObjectId()],
     });
 
@@ -21,7 +21,7 @@ describe("test Book model", () => {
       title: "Some Title",
       author: new Types.ObjectId(),
       summary: "A short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
     });
 
     expect(book2.genre).toStrictEqual([]);
@@ -71,7 +71,7 @@ describe("test DB interactions", () => {
       title: "Some Title",
       author: author._id,
       summary: "A short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
       genre: [genre._id],
     });
     const books = await Book.find()

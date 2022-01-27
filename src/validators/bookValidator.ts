@@ -4,31 +4,52 @@ import { checkSchema } from "express-validator";
 export const bookValidator = checkSchema({
   title: {
     in: ["body"],
-    errorMessage: "Title must not be empty.",
     trim: true,
-    isLength: { bail: true, options: { min: 1 } },
     escape: true,
+    isEmpty: {
+      bail: true,
+      negated: true,
+      errorMessage: "Title must not be empty.",
+    },
   },
   author: {
     in: ["body"],
-    errorMessage: "Author must not be empty.",
     trim: true,
-    isLength: { bail: true, options: { min: 1 } },
     escape: true,
+    isEmpty: {
+      bail: true,
+      negated: true,
+      errorMessage: "Author must not be empty.",
+    },
+    isMongoId: {
+      bail: true,
+      errorMessage: "Please specify a valid Mongo ID.",
+    },
   },
   summary: {
     in: ["body"],
-    errorMessage: "Summary must not be empty.",
     trim: true,
-    isLength: { bail: true, options: { min: 1 } },
     escape: true,
+    isEmpty: {
+      bail: true,
+      negated: true,
+      errorMessage: "Summary must not be empty.",
+    },
   },
   isbn: {
     in: ["body"],
-    errorMessage: "ISBN must not be empty",
     trim: true,
-    isLength: { bail: true, options: { min: 1 } },
     escape: true,
+    isEmpty: {
+      bail: true,
+      negated: true,
+      errorMessage: "ISBN must not be empty.",
+    },
+    isISBN: {
+      bail: true,
+      errorMessage: "Please specify a valid ISBN-13.",
+      options: 13,
+    },
   },
   genre: {
     in: ["body"],
@@ -36,6 +57,11 @@ export const bookValidator = checkSchema({
   },
   "genre.*": {
     in: ["body"],
+    trim: true,
     escape: true,
+    isMongoId: {
+      bail: true,
+      errorMessage: "Please specify a valid Mongo ID.",
+    },
   },
 });
