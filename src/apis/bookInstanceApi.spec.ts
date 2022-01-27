@@ -374,7 +374,7 @@ describe("bookInstanceDeleteApi", () => {
   test("HTTP 302: redirect to list view if book copy not found", async () => {
     const res = await request(app)
       .post(`/book-instance/xxxx/delete`)
-      .send({ bookInstanceId: new Types.ObjectId() });
+      .send({ bookInstanceId: new Types.ObjectId(), testId: "foo" });
 
     expect(res.status).toBe(302);
     expect(res.text).toBe("Found. Redirecting to /catalog/book-instances");

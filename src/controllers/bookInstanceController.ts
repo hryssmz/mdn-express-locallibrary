@@ -172,7 +172,7 @@ export const bookInstanceDelete = async (req: Request, res: Response) => {
     // HTTP 302: redirect to list view if bad ID provided
     return res.redirect("/catalog/book-instances");
   }
-  const bookInstance = BookInstance.findById(req.body.bookInstanceId);
+  const bookInstance = await BookInstance.findById(req.body.bookInstanceId);
   if (bookInstance === null) {
     // HTTP 302: redirect to list view if book copy not found
     return res.redirect("/catalog/book-instances");
