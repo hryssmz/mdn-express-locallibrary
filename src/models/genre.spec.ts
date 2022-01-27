@@ -3,37 +3,45 @@ import { connection, connect } from "mongoose";
 import { testMongoURL } from "../utils";
 import Genre from "./genre";
 
-describe("test Genre model", () => {
-  test("valid genres", () => {
+describe("valid Genre documents", () => {
+  test("genre with full valid fields", () => {
     const genre = new Genre({ name: "Fantasy" });
 
+    expect(genre.validateSync()).toBeUndefined();
+    // virtuals
     expect(genre.url).toBe(`/catalog/genre/${genre._id}`);
   });
+});
 
-  test("invalid genres", () => {
+describe("invalid Genre documents", () => {
+  test("genre without name", () => {
     const genre = new Genre();
     const errors = genre.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(1);
     expect(errors.name.message).toBe("Path `name` is required.");
+  });
 
-    const genre2 = new Genre({ name: "a" });
-    const errors2 = genre2.validateSync()?.errors ?? {};
+  test("genre with too short name", () => {
+    const genre = new Genre({ name: "a" });
+    const errors = genre.validateSync()?.errors ?? {};
 
-    expect(Object.keys(errors2).length).toBe(1);
-    expect(errors2.name.message).toBe(
+    expect(Object.keys(errors).length).toBe(1);
+    expect(errors.name.message).toBe(
       "Path `name` (`" +
-        genre2.name +
+        genre.name +
         "`) is shorter than the minimum allowed length (3)."
     );
+  });
 
-    const genre3 = new Genre({ name: Array(200).join("a") });
-    const errors3 = genre3.validateSync()?.errors ?? {};
+  test("genre with too long name", () => {
+    const genre = new Genre({ name: Array(200).join("a") });
+    const errors = genre.validateSync()?.errors ?? {};
 
-    expect(Object.keys(errors3).length).toBe(1);
-    expect(errors3.name.message).toBe(
+    expect(Object.keys(errors).length).toBe(1);
+    expect(errors.name.message).toBe(
       "Path `name` (`" +
-        genre3.name +
+        genre.name +
         "`) is longer than the maximum allowed length (100)."
     );
   });
@@ -59,6 +67,7 @@ describe("test DB interactions", () => {
 
     expect(genres.length).toBe(1);
     expect(genres[0]._id).toStrictEqual(genre._id);
+    expect(genres[0].name).toStrictEqual(genre.name);
   });
 
   test("does not save to DB if validation failed", async () => {
