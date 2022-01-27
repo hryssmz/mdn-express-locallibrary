@@ -4,7 +4,7 @@ import { testMongoURL } from "../utils";
 import Author from "./author";
 
 describe("valid Author documents", () => {
-  test("author will full valid fields", () => {
+  test("author with full valid fields", () => {
     const author = new Author({
       firstName: "John",
       familyName: "Doe",

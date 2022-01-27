@@ -137,6 +137,6 @@ export const authorDeleteApi = async (req: Request, res: Response) => {
     return res.json({ author, authorsBooks });
   }
   // HTTP 302: delete author and redirect to list view
-  await author.remove();
+  await author.deleteOne();
   return res.redirect("/catalog/authors");
 };

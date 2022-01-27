@@ -49,12 +49,11 @@ describe("authorListApi", () => {
       familyName: "Bush",
     });
     const res = await request(app).get("/authors");
-    const familyNames = res.body.authorList.map(
-      (author: Author) => author.familyName
-    );
 
     expect(res.status).toBe(200);
-    expect(familyNames).toStrictEqual(["Bush", "Doe"]);
+    expect(
+      res.body.authorList.map((author: Author) => author.familyName)
+    ).toStrictEqual(["Bush", "Doe"]);
   });
 });
 
@@ -185,9 +184,12 @@ describe("authorUpdateApi", () => {
   });
 
   test("HTTP 404: author not found", async () => {
-    const res = await request(app).post(
-      `/author/${new Types.ObjectId()}/update`
-    );
+    const res = await request(app)
+      .post(`/author/${new Types.ObjectId()}/update`)
+      .send({
+        firstName: "John",
+        familyName: "Doe",
+      });
 
     expect(res.status).toBe(404);
     expect(res.body).toBe("Author not found");
@@ -297,7 +299,9 @@ describe("authorDeleteApi", () => {
   });
 
   test("HTTP 302: redirect to list view if author not found", async () => {
-    const res = await request(app).post(`/author/xxxx/delete`);
+    const res = await request(app)
+      .post(`/author/xxxx/delete`)
+      .send({ authorId: new Types.ObjectId() });
 
     expect(res.status).toBe(302);
     expect(res.text).toBe("Found. Redirecting to /catalog/authors");

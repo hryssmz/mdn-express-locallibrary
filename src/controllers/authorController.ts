@@ -119,7 +119,7 @@ export const authorUpdate = async (
     });
   }
   // HTTP 302: update author and redirect to detail view
-  await author.updateOne(authorData);
+  await author.update(authorData);
   return res.redirect(author.url);
 };
 

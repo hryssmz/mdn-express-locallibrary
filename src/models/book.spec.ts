@@ -5,8 +5,8 @@ import Author from "./author";
 import Book from "./book";
 import Genre from "./genre";
 
-describe("test Book model", () => {
-  test("valid books", () => {
+describe("valid Book documents", () => {
+  test("book with full valid fields", () => {
     const book = new Book({
       title: "Some Title",
       author: new Types.ObjectId(),
@@ -15,19 +15,24 @@ describe("test Book model", () => {
       genre: [new Types.ObjectId()],
     });
 
+    // virtuals
     expect(book.url).toBe(`/catalog/book/${book._id}`);
+  });
 
-    const book2 = new Book({
+  test("book without genre", () => {
+    const book = new Book({
       title: "Some Title",
       author: new Types.ObjectId(),
       summary: "A short summary.",
       isbn: "9781234567897",
     });
 
-    expect(book2.genre).toStrictEqual([]);
+    expect(book.genre).toStrictEqual([]);
   });
+});
 
-  test("invalid books", () => {
+describe("invalid Book documents", () => {
+  test("book without title, author, summary and isbn", () => {
     const book = new Book();
     const errors = book.validateSync()?.errors ?? {};
 
@@ -82,6 +87,8 @@ describe("test DB interactions", () => {
     expect(books[0]._id).toStrictEqual(book._id);
     expect(books[0].author._id).toStrictEqual(author._id);
     expect(books[0].author.firstName).toBe(author.firstName);
+    expect(books[0].summary).toBe(book.summary);
+    expect(books[0].isbn).toBe(book.isbn);
     expect(books[0].genre.length).toBe(1);
     expect(books[0].genre[0]._id).toStrictEqual(genre._id);
     expect(books[0].genre[0].name).toStrictEqual(genre.name);
