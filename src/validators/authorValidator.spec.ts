@@ -91,11 +91,11 @@ describe("invalid requests", () => {
 
     expect(res.body.errors).toStrictEqual({
       firstName: {
-        msg: "First name must be specified.",
+        msg: "First name must be specified",
         value: "",
       },
       familyName: {
-        msg: "Family name must be specified.",
+        msg: "Family name must be specified",
         value: "",
       },
     });
@@ -112,11 +112,11 @@ describe("invalid requests", () => {
 
     expect(res.body.errors).toStrictEqual({
       firstName: {
-        msg: "First name must be at most 100 chars long.",
+        msg: "First name must be at most 100 chars long",
         value: firstName,
       },
       familyName: {
-        msg: "Family name must be at most 100 chars long.",
+        msg: "Family name must be at most 100 chars long",
         value: familyName,
       },
     });
@@ -131,11 +131,11 @@ describe("invalid requests", () => {
 
     expect(res.body.errors).toStrictEqual({
       firstName: {
-        msg: "First name has non-alphanumeric characters.",
+        msg: "First name has non-alphanumeric characters",
         value: "John, Doe",
       },
       familyName: {
-        msg: "Family name has non-alphanumeric characters.",
+        msg: "Family name has non-alphanumeric characters",
         value: "&lt;script&gt;doSomethingEvil();&lt;&#x2F;script&gt;",
       },
     });
@@ -160,14 +160,14 @@ describe("invalid requests", () => {
       },
       dateOfDeath: {
         msg: "Invalid date of death",
-        value: 0,
+        value: "0",
       },
     });
     expect(res.body.body).toStrictEqual({
       firstName: "John",
       familyName: "Doe",
-      dateOfBirth: null,
-      dateOfDeath: "1999-12-31T15:00:00.000Z", // nonsense value
+      dateOfBirth: "INVALID",
+      dateOfDeath: "0",
     });
   });
 });

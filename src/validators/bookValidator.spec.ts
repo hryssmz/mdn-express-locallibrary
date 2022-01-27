@@ -91,10 +91,10 @@ describe("invalid requests", () => {
     const res = await request(app).post("/");
 
     expect(res.body.errors).toStrictEqual({
-      title: { msg: "Title must not be empty.", value: "" },
-      author: { msg: "Author must not be empty.", value: "" },
-      summary: { msg: "Summary must not be empty.", value: "" },
-      isbn: { msg: "ISBN must not be empty.", value: "" },
+      title: { msg: "Title must not be empty", value: "" },
+      author: { msg: "Author must not be empty", value: "" },
+      summary: { msg: "Summary must not be empty", value: "" },
+      isbn: { msg: "ISBN must not be empty", value: "" },
     });
     expect(res.body.body).toStrictEqual({
       title: "",
@@ -118,11 +118,11 @@ describe("invalid requests", () => {
 
     expect(res.body.errors).toStrictEqual({
       author: {
-        msg: "Please specify a valid Mongo ID.",
+        msg: "Please specify a valid Mongo ID",
         value: "badObjectId1",
       },
       "genre[0]": {
-        msg: "Please specify a valid Mongo ID.",
+        msg: "Please specify a valid Mongo ID",
         value: "badObjectId2",
       },
     });
@@ -146,7 +146,7 @@ describe("invalid requests", () => {
 
     expect(res.body.errors).toStrictEqual({
       isbn: {
-        msg: "Please specify a valid ISBN-13.",
+        msg: "Please specify a valid ISBN-13",
         value: "9999999999999",
       },
     });

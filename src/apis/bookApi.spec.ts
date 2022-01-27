@@ -110,10 +110,14 @@ describe("bookListApi", () => {
       isbn: "9781234567903",
     });
     const res = await request(app).get("/books");
-    const titles = res.body.bookList.map((book: Book) => book.title);
 
     expect(res.status).toBe(200);
-    expect(titles).toStrictEqual(["Another Test Title", "The Test Title"]);
+    // Books are sorted by title.
+    expect(res.body.bookList.map((book: Book) => book.title)).toStrictEqual([
+      "Another Test Title",
+      "The Test Title",
+    ]);
+    expect(res.body.bookList[0].author.firstName).toBe(author.firstName);
   });
 });
 
@@ -218,25 +222,25 @@ describe("bookCreateApi", () => {
     expect(res.body.errors).toStrictEqual({
       title: {
         location: "body",
-        msg: "Title must not be empty.",
+        msg: "Title must not be empty",
         param: "title",
         value: "",
       },
       author: {
         location: "body",
-        msg: "Author must not be empty.",
+        msg: "Author must not be empty",
         param: "author",
         value: "",
       },
       summary: {
         location: "body",
-        msg: "Summary must not be empty.",
+        msg: "Summary must not be empty",
         param: "summary",
         value: "",
       },
       isbn: {
         location: "body",
-        msg: "ISBN must not be empty.",
+        msg: "ISBN must not be empty",
         param: "isbn",
         value: "",
       },
@@ -299,13 +303,13 @@ describe("bookUpdateGetApi", () => {
     const res = await request(app).get(`/book/${book._id}/update`);
 
     expect(res.status).toBe(200);
-    expect(res.body.book._id).toBe(String(book._id));
     // Authors are sorted by family name.
     expect(
       res.body.authors.map((author: Author) => author.familyName)
     ).toStrictEqual(["Bush", "Doe"]);
     expect(res.body.genres.length).toBe(1);
     expect(res.body.genres[0]._id).toBe(String(genre._id));
+    expect(res.body.book._id).toBe(String(book._id));
   });
 });
 
@@ -371,25 +375,25 @@ describe("bookUpdateApi", () => {
     expect(res.body.errors).toStrictEqual({
       title: {
         location: "body",
-        msg: "Title must not be empty.",
+        msg: "Title must not be empty",
         param: "title",
         value: "",
       },
       author: {
         location: "body",
-        msg: "Author must not be empty.",
+        msg: "Author must not be empty",
         param: "author",
         value: "",
       },
       summary: {
         location: "body",
-        msg: "Summary must not be empty.",
+        msg: "Summary must not be empty",
         param: "summary",
         value: "",
       },
       isbn: {
         location: "body",
-        msg: "ISBN must not be empty.",
+        msg: "ISBN must not be empty",
         param: "isbn",
         value: "",
       },

@@ -12,13 +12,12 @@ describe("valid BookInstance documents", () => {
       status: "Loaned",
       dueBack: new Date("2020-01-01"),
     });
-    const errors = bookInstance.validateSync()?.errors ?? {};
 
+    expect(bookInstance.validateSync()).toBeUndefined();
     // virtuals
     expect(bookInstance.url).toBe(`/catalog/book-instance/${bookInstance._id}`);
     expect(bookInstance.dueBackFormatted).toBe("Jan 1, 2020");
     expect(bookInstance.dueBackISO).toBe("2020-01-01");
-    expect(Object.keys(errors).length).toBe(0);
   });
 
   test("bookInstance without status and dueBack", () => {
@@ -26,13 +25,12 @@ describe("valid BookInstance documents", () => {
       book: new Types.ObjectId(),
       imprint: "Foo Imprint",
     });
-    const errors = bookInstance.validateSync()?.errors ?? {};
 
+    expect(bookInstance.validateSync()).toBeUndefined();
     // Default to Maintenance.
     expect(bookInstance.status).toBe("Maintenance");
     // Default to current Date().
     expect(Date.now() - Number(bookInstance.dueBack)).toBeLessThan(10);
-    expect(Object.keys(errors).length).toBe(0);
   });
 
   test("bookInstance with empty dueBack", () => {
@@ -41,11 +39,10 @@ describe("valid BookInstance documents", () => {
       imprint: "Foo Imprint",
       dueBack: "",
     });
-    const errors = bookInstance.validateSync()?.errors ?? {};
 
+    expect(bookInstance.validateSync()).toBeUndefined();
     expect(bookInstance.dueBackFormatted).toBe("");
     expect(bookInstance.dueBackISO).toBe("");
-    expect(Object.keys(errors).length).toBe(0);
   });
 });
 

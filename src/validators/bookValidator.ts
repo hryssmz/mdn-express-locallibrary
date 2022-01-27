@@ -9,7 +9,7 @@ export const bookValidator = checkSchema({
     isEmpty: {
       bail: true,
       negated: true,
-      errorMessage: "Title must not be empty.",
+      errorMessage: "Title must not be empty",
     },
   },
   author: {
@@ -19,11 +19,11 @@ export const bookValidator = checkSchema({
     isEmpty: {
       bail: true,
       negated: true,
-      errorMessage: "Author must not be empty.",
+      errorMessage: "Author must not be empty",
     },
     isMongoId: {
       bail: true,
-      errorMessage: "Please specify a valid Mongo ID.",
+      errorMessage: "Please specify a valid Mongo ID",
     },
   },
   summary: {
@@ -33,7 +33,7 @@ export const bookValidator = checkSchema({
     isEmpty: {
       bail: true,
       negated: true,
-      errorMessage: "Summary must not be empty.",
+      errorMessage: "Summary must not be empty",
     },
   },
   isbn: {
@@ -43,11 +43,11 @@ export const bookValidator = checkSchema({
     isEmpty: {
       bail: true,
       negated: true,
-      errorMessage: "ISBN must not be empty.",
+      errorMessage: "ISBN must not be empty",
     },
     isISBN: {
       bail: true,
-      errorMessage: "Please specify a valid ISBN-13.",
+      errorMessage: "Please specify a valid ISBN-13",
       options: 13,
     },
   },
@@ -61,7 +61,7 @@ export const bookValidator = checkSchema({
     escape: true,
     isMongoId: {
       bail: true,
-      errorMessage: "Please specify a valid Mongo ID.",
+      errorMessage: "Please specify a valid Mongo ID",
     },
   },
 });

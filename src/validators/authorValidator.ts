@@ -9,16 +9,16 @@ export const authorValidator = checkSchema({
     isEmpty: {
       bail: true,
       negated: true,
-      errorMessage: "First name must be specified.",
+      errorMessage: "First name must be specified",
     },
     isLength: {
       bail: true,
-      errorMessage: "First name must be at most 100 chars long.",
+      errorMessage: "First name must be at most 100 chars long",
       options: { max: 100 },
     },
     isAlphanumeric: {
       bail: true,
-      errorMessage: "First name has non-alphanumeric characters.",
+      errorMessage: "First name has non-alphanumeric characters",
     },
   },
   familyName: {
@@ -28,32 +28,34 @@ export const authorValidator = checkSchema({
     isEmpty: {
       bail: true,
       negated: true,
-      errorMessage: "Family name must be specified.",
+      errorMessage: "Family name must be specified",
     },
     isLength: {
       bail: true,
-      errorMessage: "Family name must be at most 100 chars long.",
+      errorMessage: "Family name must be at most 100 chars long",
       options: { max: 100 },
     },
     isAlphanumeric: {
       bail: true,
-      errorMessage: "Family name has non-alphanumeric characters.",
+      errorMessage: "Family name has non-alphanumeric characters",
     },
   },
   dateOfBirth: {
     in: ["body"],
-    errorMessage: "Invalid date of birth",
+    trim: true,
+    escape: true,
     optional: true,
     default: { options: undefined },
-    isISO8601: true,
+    isISO8601: { bail: true, errorMessage: "Invalid date of birth" },
     toDate: true,
   },
   dateOfDeath: {
     in: ["body"],
-    errorMessage: "Invalid date of death",
+    trim: true,
+    escape: true,
     optional: true,
     default: { options: undefined },
-    isISO8601: true,
+    isISO8601: { bail: true, errorMessage: "Invalid date of death" },
     toDate: true,
   },
 });
