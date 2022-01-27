@@ -11,6 +11,7 @@ describe("valid Author documents", () => {
       dateOfBirth: new Date("1970-01-01"),
       dateOfDeath: new Date("2020-12-31"),
     });
+    const errors = author.validateSync()?.errors ?? {};
 
     // virtuals
     expect(author.name).toBe("John, Doe");
@@ -18,18 +19,20 @@ describe("valid Author documents", () => {
     expect(author.dateOfDeathISO).toBe("2020-12-31");
     expect(author.lifespan).toBe("Jan 1, 1970 - Dec 31, 2020");
     expect(author.url).toBe(`/catalog/author/${author._id}`);
+    expect(Object.keys(errors).length).toBe(0);
   });
 
-  test("author without dates and with an empty family name", () => {
-    const author = new Author({ firstName: "John", familyName: "" });
+  test("author without dates", () => {
+    const author = new Author({ firstName: "John", familyName: "Doe" });
+    const errors = author.validateSync()?.errors ?? {};
 
     expect(author.dateOfBirth).toBeUndefined();
     expect(author.dateOfDeath).toBeUndefined();
     // virtuals
-    expect(author.name).toBe("");
     expect(author.dateOfBirthISO).toBe("");
     expect(author.dateOfDeathISO).toBe("");
     expect(author.lifespan).toBe(" - ");
+    expect(Object.keys(errors).length).toBe(0);
   });
 });
 

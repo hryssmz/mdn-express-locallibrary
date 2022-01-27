@@ -14,9 +14,11 @@ describe("valid Book documents", () => {
       isbn: "9781234567897",
       genre: [new Types.ObjectId()],
     });
+    const errors = book.validateSync()?.errors ?? {};
 
     // virtuals
     expect(book.url).toBe(`/catalog/book/${book._id}`);
+    expect(Object.keys(errors).length).toBe(0);
   });
 
   test("book without genre", () => {
@@ -26,8 +28,10 @@ describe("valid Book documents", () => {
       summary: "A short summary.",
       isbn: "9781234567897",
     });
+    const errors = book.validateSync()?.errors ?? {};
 
     expect(book.genre).toStrictEqual([]);
+    expect(Object.keys(errors).length).toBe(0);
   });
 });
 

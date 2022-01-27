@@ -28,9 +28,7 @@ const authorSchema = new Schema<Author, AuthorModel, unknown>({
 });
 
 authorSchema.virtual("name").get(function (this: Author): string {
-  return this.firstName && this.familyName
-    ? `${this.firstName}, ${this.familyName}`
-    : "";
+  return `${this.firstName}, ${this.familyName}`;
 });
 
 authorSchema.virtual("dateOfBirthISO").get(function (this: Author): string {
