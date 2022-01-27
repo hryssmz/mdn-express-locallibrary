@@ -8,7 +8,7 @@ A simple Express local library app provided by MDN.
 
 ```bash
 git clone https://github.com/hryssmz/mdn-express-locallibrary.git
-cd mdn-express-locallibrary.git
+cd mdn-express-locallibrary
 npm install
 
 # Start development mode.
@@ -190,3 +190,4 @@ npm install -D @types/luxon
 - [`dev/v0`](https://github.com/hryssmz/mdn-express-locallibrary/commit/966326c4740830915d88285d35a073ba85927d9c): Setup for the project
 - [`dev/v1`](https://github.com/hryssmz/mdn-express-locallibrary/commit/9b1ad5d760514b8b36c5dba14dd2264e5818eb7e): Add APIs
 - [`dev/v2`](https://github.com/hryssmz/mdn-express-locallibrary/commit/fd6af18ae7126623dce15722297af5e2ca365bd6): Add views
+- [`dev/v2.1`](https://github.com/hryssmz/mdn-express-locallibrary/commit/114feaa2de1817bcc9413e4932a4cf16bdf8c6f6): Isolate validators from request handlers

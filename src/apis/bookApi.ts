@@ -1,6 +1,8 @@
 // apis/bookApi.ts
-import { Request, Response, NextFunction } from "express";
-import { body, validationResult } from "express-validator";
+import { Request, Response } from "express";
+import { validationResult } from "express-validator";
+import { Types } from "mongoose";
+import { bookValidator } from "../validators/bookValidator";
 import Author from "../models/author";
 import Book from "../models/book";
 import BookInstance from "../models/bookInstance";
@@ -20,6 +22,7 @@ export const indexApi = async (req: Request, res: Response) => {
     Author.countDocuments(),
     Genre.countDocuments(),
   ]);
+  // HTTP 200: return number of each record in the library
   return res.json({
     data: {
       bookCount,
@@ -35,24 +38,29 @@ export const bookListApi = async (req: Request, res: Response) => {
   const bookList = await Book.find({}, "title author")
     .sort({ title: 1 })
     .populate<{ author: Author }>("author");
+  // HTTP 200: return book list sorted by title
   return res.json({ bookList });
 };
 
 export const bookDetailApi = async (req: Request, res: Response) => {
   try {
-    const [book, bookInstances] = await Promise.all([
-      Book.findById(req.params.id)
-        .populate<{ author: Author }>("author")
-        .populate<{ genre: Genre[] }>("genre"),
-      BookInstance.find({ book: req.params.id }),
-    ]);
-    if (book === null) {
-      return res.status(404).json("Book not found");
-    }
-    return res.json({ book, bookInstances });
+    new Types.ObjectId(req.params.id);
   } catch (err) {
-    return res.status(500).json(err);
+    // HTTP 404: bad ID provided
+    return res.status(404).json("Book not found");
   }
+  const [book, bookInstances] = await Promise.all([
+    Book.findById(req.params.id)
+      .populate<{ author: Author }>("author")
+      .populate<{ genre: Genre[] }>("genre"),
+    BookInstance.find({ book: req.params.id }),
+  ]);
+  if (book === null) {
+    // HTTP 404: book not found
+    return res.status(404).json("Book not found");
+  }
+  // HTTP 200: return book and all its copies
+  return res.json({ book, bookInstances });
 };
 
 export const bookCreateGetApi = async (req: Request, res: Response) => {
@@ -60,141 +68,130 @@ export const bookCreateGetApi = async (req: Request, res: Response) => {
     Author.find().sort({ familyName: 1 }),
     Genre.find(),
   ]);
+  // HTTP 200: return all related authors and genres
   return res.json({ authors, genres });
 };
 
-export const bookCreateApi = [
-  (req: Request, res: Response, next: NextFunction) => {
-    if (!(req.body.genre instanceof Array)) {
-      req.body.genre = req.body.genre === undefined ? [] : [req.body.genre];
-    }
-    return next();
-  },
-
-  body("title", "Title must not be empty.")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body("author", "Author must not be empty.")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body("summary", "Summary must not be empty.")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body("isbn", "ISBN must not be empty").trim().isLength({ min: 1 }).escape(),
-  body("genre.*").escape(),
-
-  async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const [authors, genres] = await Promise.all([
-        Author.find().sort({ familyName: 1 }),
-        Genre.find(),
-      ]);
-      return res
-        .status(400)
-        .json({ authors, genres, book: req.body, errors: errors.array() });
-    }
-    try {
-      const book = await Book.create(req.body);
-      return res.redirect(book.url);
-    } catch (err) {
-      return res.status(500).json(err);
-    }
-  },
-];
-
-export const bookUpdateGetApi = async (req: Request, res: Response) => {
-  try {
-    const [book, authors, genres] = await Promise.all([
-      Book.findById(req.params.id),
+export const bookCreateApi = async (req: Request, res: Response) => {
+  await bookValidator.run(req);
+  const errors = validationResult(req);
+  const bookData = {
+    title: req.body.title,
+    author: req.body.author,
+    summary: req.body.summary,
+    isbn: req.body.isbn,
+    genre: req.body.genre,
+  };
+  if (!errors.isEmpty()) {
+    const [authors, genres] = await Promise.all([
       Author.find().sort({ familyName: 1 }),
       Genre.find(),
     ]);
-    if (book === null) {
-      return res.status(404).json("Book not found");
-    }
-    return res.json({ authors, genres, book });
-  } catch (err) {
-    return res.status(500).json(err);
+    // HTTP 400: return authors, genres, book data, and validation errors
+    return res
+      .status(400)
+      .json({ authors, genres, book: bookData, errors: errors.mapped() });
   }
+  // HTTP 302: create book and redirect to detail view
+  const book = await Book.create(bookData);
+  return res.redirect(book.url);
 };
 
-export const bookUpdateApi = [
-  (req: Request, res: Response, next: NextFunction) => {
-    if (!(req.body.genre instanceof Array)) {
-      req.body.genre = req.body.genre === undefined ? [] : [req.body.genre];
-    }
-    return next();
-  },
+export const bookUpdateGetApi = async (req: Request, res: Response) => {
+  try {
+    new Types.ObjectId(req.params.id);
+  } catch (err) {
+    // HTTP 404: bad ID provided
+    return res.status(404).json("Book not found");
+  }
+  const [book, authors, genres] = await Promise.all([
+    Book.findById(req.params.id),
+    Author.find().sort({ familyName: 1 }),
+    Genre.find(),
+  ]);
+  if (book === null) {
+    // HTTP 404: book not found
+    return res.status(404).json("Book not found");
+  }
+  // HTTP 200: return authors, genres, and book data
+  return res.json({ authors, genres, book });
+};
 
-  body("title", "Title must not be empty.")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body("author", "Author must not be empty.")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body("summary", "Summary must not be empty.")
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body("isbn", "ISBN must not be empty").trim().isLength({ min: 1 }).escape(),
-  body("genre.*").escape(),
-
-  async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const [authors, genres] = await Promise.all([
-        Author.find().sort({ familyName: 1 }),
-        Genre.find(),
-      ]);
-      return res
-        .status(400)
-        .json({ authors, genres, book: req.body, errors: errors.array() });
-    }
-    try {
-      const book = await Book.findByIdAndUpdate(req.params.id, req.body);
-      if (book === null) {
-        return res.status(404).json("Book not found");
-      }
-      return res.redirect(book.url);
-    } catch (err) {
-      return res.status(500).json(err);
-    }
-  },
-];
+export const bookUpdateApi = async (req: Request, res: Response) => {
+  try {
+    new Types.ObjectId(req.params.id);
+  } catch (err) {
+    // HTTP 404: bad ID provided
+    return res.status(404).json("Book not found");
+  }
+  const book = await Book.findById(req.params.id);
+  if (book === null) {
+    // HTTP 404: book not found
+    return res.status(404).json("Book not found");
+  }
+  await bookValidator.run(req);
+  const errors = validationResult(req);
+  const bookData = {
+    title: req.body.title,
+    author: req.body.author,
+    summary: req.body.summary,
+    isbn: req.body.isbn,
+    genre: req.body.genre,
+  };
+  if (!errors.isEmpty()) {
+    const [authors, genres] = await Promise.all([
+      Author.find().sort({ familyName: 1 }),
+      Genre.find(),
+    ]);
+    // HTTP 400: return authors, genres, book data, and validation errors
+    return res
+      .status(400)
+      .json({ authors, genres, book: bookData, errors: errors.mapped() });
+  }
+  // HTTP 302: update book and redirect to detail view
+  await book.updateOne(bookData);
+  return res.redirect(book.url);
+};
 
 export const bookDeleteGetApi = async (req: Request, res: Response) => {
   try {
-    const [book, bookInstances] = await Promise.all([
-      Book.findById(req.params.id),
-      BookInstance.find({ book: req.params.id }),
-    ]);
-    if (book === null) {
-      return res.redirect("/catalog/books");
-    }
-    return res.json({ book, bookInstances });
+    new Types.ObjectId(req.params.id);
   } catch (err) {
-    return res.status(500).json(err);
+    // HTTP 302: redirect to list view if bad ID provided
+    return res.redirect("/catalog/books");
   }
+  const [book, bookInstances] = await Promise.all([
+    Book.findById(req.params.id),
+    BookInstance.find({ book: req.params.id }),
+  ]);
+  if (book === null) {
+    // HTTP 302: redirect to list view if book not found
+    return res.redirect("/catalog/books");
+  }
+  // HTTP 200: return book and all its copies
+  return res.json({ book, bookInstances });
 };
 
 export const bookDeleteApi = async (req: Request, res: Response) => {
   try {
-    const [book, bookInstances] = await Promise.all([
-      Book.findById(req.body.bookId),
-      BookInstance.find({ book: req.body.bookId }),
-    ]);
-    if (bookInstances.length > 0) {
-      return res.json({ book, bookInstances });
-    }
-    await Book.findByIdAndRemove(req.body.bookId);
-    return res.redirect("/catalog/books");
+    new Types.ObjectId(req.body.bookId);
   } catch (err) {
-    return res.status(500).json(err);
+    // HTTP 302: redirect to list view if bad ID provided
+    return res.redirect("/catalog/books");
   }
+  const [book, bookInstances] = await Promise.all([
+    Book.findById(req.body.bookId),
+    BookInstance.find({ book: req.body.bookId }),
+  ]);
+  if (book === null) {
+    // HTTP 302: redirect to list view if book not found
+    return res.redirect("/catalog/books");
+  }
+  if (bookInstances.length > 0) {
+    // HTTP 200: return book and all its copies without deleting
+    return res.json({ book, bookInstances });
+  }
+  // HTTP 302: delete book and redirect to list view
+  await book.deleteOne();
+  return res.redirect("/catalog/books");
 };

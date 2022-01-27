@@ -1,45 +1,47 @@
 // models/genre.spec.ts
 import { connection, connect } from "mongoose";
-import { testMongoURL } from "../utils";
-import Genre from "./genre";
+import { testMongoURL } from "../../src/utils";
+import Genre from "../../src/models/genre";
 
-describe("test Genre model", () => {
-  test("genre with full info", () => {
+describe("valid Genre documents", () => {
+  test("genre with full valid fields", () => {
     const genre = new Genre({ name: "Fantasy" });
 
+    expect(genre.validateSync()).toBeUndefined();
+    // virtuals
     expect(genre.url).toBe(`/catalog/genre/${genre._id}`);
   });
+});
 
-  test("invalid genre without the required properties", () => {
-    const error = new Genre().validateSync();
-    const errors = error ? error.errors : {};
+describe("invalid Genre documents", () => {
+  test("genre without name", () => {
+    const genre = new Genre();
+    const errors = genre.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(1);
     expect(errors.name.message).toBe("Path `name` is required.");
   });
 
-  test("invalid genre with a short name", () => {
-    const name = "a";
-    const error = new Genre({ name }).validateSync();
-    const errors = error ? error.errors : {};
+  test("genre with too short name", () => {
+    const genre = new Genre({ name: "a" });
+    const errors = genre.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(1);
     expect(errors.name.message).toBe(
       "Path `name` (`" +
-        name +
+        genre.name +
         "`) is shorter than the minimum allowed length (3)."
     );
   });
 
-  test("invalid genre with a long name", () => {
-    const name = Array(200).join("a");
-    const error = new Genre({ name }).validateSync();
-    const errors = error ? error.errors : {};
+  test("genre with too long name", () => {
+    const genre = new Genre({ name: Array(200).join("a") });
+    const errors = genre.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(1);
     expect(errors.name.message).toBe(
       "Path `name` (`" +
-        name +
+        genre.name +
         "`) is longer than the maximum allowed length (100)."
     );
   });
@@ -65,6 +67,7 @@ describe("test DB interactions", () => {
 
     expect(genres.length).toBe(1);
     expect(genres[0]._id).toStrictEqual(genre._id);
+    expect(genres[0].name).toStrictEqual(genre.name);
   });
 
   test("does not save to DB if validation failed", async () => {

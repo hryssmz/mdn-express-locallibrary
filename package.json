@@ -8,8 +8,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "tsc --noEmit -p tsconfig.json && eslint --max-warnings=0 .",
-    "test": "jest -o --bail --coverage=false --detectOpenHandles",
-    "testAll": "jest --bail --detectOpenHandles"
+    "test": "jest -o --coverage=false --detectOpenHandles",
+    "testAll": "jest --detectOpenHandles"
   },
   "repository": {
     "type": "git",

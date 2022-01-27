@@ -1,20 +1,22 @@
 // models/book.spec.ts
 import { Types, connection, connect } from "mongoose";
-import { testMongoURL } from "../utils";
-import Author from "./author";
-import Book from "./book";
-import Genre from "./genre";
+import { testMongoURL } from "../../src/utils";
+import Author from "../../src/models/author";
+import Book from "../../src/models/book";
+import Genre from "../../src/models/genre";
 
-describe("test Book model", () => {
-  test("book with full info", () => {
+describe("valid Book documents", () => {
+  test("book with full valid fields", () => {
     const book = new Book({
       title: "Some Title",
       author: new Types.ObjectId(),
       summary: "A short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
       genre: [new Types.ObjectId()],
     });
 
+    expect(book.validateSync()).toBeUndefined();
+    // virtuals
     expect(book.url).toBe(`/catalog/book/${book._id}`);
   });
 
@@ -23,15 +25,18 @@ describe("test Book model", () => {
       title: "Some Title",
       author: new Types.ObjectId(),
       summary: "A short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
     });
 
+    expect(book.validateSync()).toBeUndefined();
     expect(book.genre).toStrictEqual([]);
   });
+});
 
-  test("invalid book without the required properties", () => {
-    const error = new Book().validateSync();
-    const errors = error ? error.errors : {};
+describe("invalid Book documents", () => {
+  test("book without title, author, summary and isbn", () => {
+    const book = new Book();
+    const errors = book.validateSync()?.errors ?? {};
 
     expect(Object.keys(errors).length).toBe(4);
     expect(errors.title.message).toBe("Path `title` is required.");
@@ -73,7 +78,7 @@ describe("test DB interactions", () => {
       title: "Some Title",
       author: author._id,
       summary: "A short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
       genre: [genre._id],
     });
     const books = await Book.find()
@@ -84,6 +89,8 @@ describe("test DB interactions", () => {
     expect(books[0]._id).toStrictEqual(book._id);
     expect(books[0].author._id).toStrictEqual(author._id);
     expect(books[0].author.firstName).toBe(author.firstName);
+    expect(books[0].summary).toBe(book.summary);
+    expect(books[0].isbn).toBe(book.isbn);
     expect(books[0].genre.length).toBe(1);
     expect(books[0].genre[0]._id).toStrictEqual(genre._id);
     expect(books[0].genre[0].name).toStrictEqual(genre.name);

@@ -4,13 +4,13 @@ import express, { Request, Response, NextFunction } from "express";
 import createError, { HttpError } from "http-errors";
 import { connect } from "mongoose";
 import logger from "morgan";
+import { mongoURL } from "./utils";
 import catalogRouter from "./routes/catalog";
 import indexRouter from "./routes";
 
 const app = express();
 
 // Setup mongoose connection.
-export const mongoURL = "mongodb://localhost:27017/local_library";
 connect(mongoURL)
   .then(() => {
     console.log(`DB connection "${mongoURL}" established`);
