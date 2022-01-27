@@ -81,13 +81,13 @@ describe("authorDetailApi", () => {
       title: "John Doe's Book",
       author: author._id,
       summary: "Here's a short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
     });
     await Book.create({
       title: "Somebody Else's Book",
       author: new Types.ObjectId(),
       summary: "Here's another short summary.",
-      isbn: "1234567890001",
+      isbn: "9781234567903",
     });
     const res = await request(app).get(`/author/${author._id}`);
 
@@ -271,13 +271,13 @@ describe("authorDeleteGetApi", () => {
       title: "John Doe's Book",
       author: author._id,
       summary: "Here's a short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
     });
     await Book.create({
       title: "Somebody Else's Book",
       author: new Types.ObjectId(),
       summary: "Here's another short summary.",
-      isbn: "1234567890001",
+      isbn: "9781234567903",
     });
     const res = await request(app).get(`/author/${author._id}/delete`);
 
@@ -316,13 +316,13 @@ describe("authorDeleteApi", () => {
       title: "John Doe's Book",
       author: author._id,
       summary: "Here's a short summary.",
-      isbn: "1234567890000",
+      isbn: "9781234567897",
     });
     await Book.create({
       title: "Somebody Else's Book",
       author: new Types.ObjectId(),
       summary: "Here's another short summary.",
-      isbn: "1234567890001",
+      isbn: "9781234567903",
     });
 
     expect(await Author.countDocuments()).toBe(1);

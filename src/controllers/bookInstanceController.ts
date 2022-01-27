@@ -74,7 +74,7 @@ export const bookInstanceCreate = async (req: Request, res: Response) => {
     });
   }
   // HTTP 302: create book copy and redirect to detail view
-  const bookInstance = await BookInstance.create(req.body);
+  const bookInstance = await BookInstance.create(bookInstanceData);
   return res.redirect(bookInstance.url);
 };
 
@@ -137,7 +137,7 @@ export const bookInstanceUpdate = async (
       title: "Update BookInstance",
       bookList,
       statusChoices,
-      bookInstance: req.body,
+      bookInstance: bookInstanceData,
       errors: errors.mapped(),
     });
   }

@@ -147,7 +147,7 @@ export const bookUpdate = async (
     // HTTP 404: bad ID provided
     return next(createError(404, "Book not found"));
   }
-  const book = await Book.findByIdAndUpdate(req.params.id, req.body);
+  const book = await Book.findById(req.params.id);
   if (book === null) {
     // HTTP 404: book not found
     return next(createError(404, "Book not found"));
@@ -171,7 +171,7 @@ export const bookUpdate = async (
       title: "Update Book",
       authors,
       genres,
-      book: req.body,
+      book: bookData,
       errors: errors.mapped(),
     });
   }
@@ -227,6 +227,6 @@ export const bookDelete = async (req: Request, res: Response) => {
     });
   }
   // HTTP 302: delete book and redirect to list view
-  await Book.findByIdAndRemove(req.body.bookId);
+  await book.deleteOne();
   return res.redirect("/catalog/books");
 };

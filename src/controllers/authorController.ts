@@ -170,6 +170,6 @@ export const authorDelete = async (req: Request, res: Response) => {
     });
   }
   // HTTP 302: delete author and redirect to list view
-  await Author.findByIdAndRemove(req.body.authorId);
+  await author.deleteOne();
   return res.redirect("/catalog/authors");
 };
