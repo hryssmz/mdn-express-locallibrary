@@ -3,7 +3,7 @@ import express, { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { Types } from "mongoose";
 import request from "supertest";
-import { bookInstanceValidator } from "./bookInstanceValidator";
+import { bookInstanceValidator } from "../../src/validators/bookInstanceValidator";
 
 const app = express();
 

@@ -164,9 +164,9 @@ export default {
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   // ],
   testMatch: [
-    "<rootDir>/src/apis/*.spec.ts",
-    "<rootDir>/src/models/*.spec.ts",
-    "<rootDir>/src/validators/*.spec.ts",
+    "<rootDir>/tests/apis/*.spec.ts",
+    "<rootDir>/tests/models/*.spec.ts",
+    "<rootDir>/tests/validators/*.spec.ts",
   ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped

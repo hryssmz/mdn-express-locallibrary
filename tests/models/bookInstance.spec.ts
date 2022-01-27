@@ -1,8 +1,8 @@
 // models/bookInstance.spec.ts
 import { Types, connection, connect } from "mongoose";
-import { testMongoURL } from "../utils";
-import Book from "./book";
-import BookInstance from "./bookInstance";
+import { testMongoURL } from "../../src/utils";
+import Book from "../../src/models/book";
+import BookInstance from "../../src/models/bookInstance";
 
 describe("valid BookInstance documents", () => {
   test("bookInstance with full valid fields", () => {

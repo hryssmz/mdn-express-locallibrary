@@ -2,11 +2,11 @@
 import express from "express";
 import { connect, connection, Types } from "mongoose";
 import request from "supertest";
-import { testMongoURL } from "../utils";
-import Author from "../models/author";
-import Book from "../models/book";
-import BookInstance from "../models/bookInstance";
-import Genre from "../models/genre";
+import { testMongoURL } from "../../src/utils";
+import Author from "../../src/models/author";
+import Book from "../../src/models/book";
+import BookInstance from "../../src/models/bookInstance";
+import Genre from "../../src/models/genre";
 import {
   indexApi,
   bookListApi,
@@ -17,7 +17,7 @@ import {
   bookUpdateApi,
   bookDeleteGetApi,
   bookDeleteApi,
-} from "./bookApi";
+} from "../../src/apis/bookApi";
 
 const app = express();
 

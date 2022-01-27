@@ -2,7 +2,7 @@
 import express, { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import request from "supertest";
-import { genreValidator } from "./genreValidator";
+import { genreValidator } from "../../src/validators/genreValidator";
 
 const app = express();
 

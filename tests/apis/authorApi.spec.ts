@@ -2,9 +2,9 @@
 import express from "express";
 import { connect, connection, Types } from "mongoose";
 import request from "supertest";
-import { testMongoURL } from "../utils";
-import Author from "../models/author";
-import Book from "../models/book";
+import { testMongoURL } from "../../src/utils";
+import Author from "../../src/models/author";
+import Book from "../../src/models/book";
 import {
   authorListApi,
   authorDetailApi,
@@ -13,7 +13,7 @@ import {
   authorUpdateApi,
   authorDeleteGetApi,
   authorDeleteApi,
-} from "./authorApi";
+} from "../../src/apis/authorApi";
 
 const app = express();
 

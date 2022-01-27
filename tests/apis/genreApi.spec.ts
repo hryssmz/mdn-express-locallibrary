@@ -2,9 +2,9 @@
 import express from "express";
 import { connect, connection, Types } from "mongoose";
 import request from "supertest";
-import { testMongoURL } from "../utils";
-import Book from "../models/book";
-import Genre from "../models/genre";
+import { testMongoURL } from "../../src/utils";
+import Book from "../../src/models/book";
+import Genre from "../../src/models/genre";
 import {
   genreListApi,
   genreDetailApi,
@@ -13,7 +13,7 @@ import {
   genreUpdateApi,
   genreDeleteGetApi,
   genreDeleteApi,
-} from "./genreApi";
+} from "../../src/apis/genreApi";
 
 const app = express();
 

@@ -1,7 +1,7 @@
 // models/author.spec.ts
 import { connection, connect } from "mongoose";
-import { testMongoURL } from "../utils";
-import Author from "./author";
+import { testMongoURL } from "../../src/utils";
+import Author from "../../src/models/author";
 
 describe("valid Author documents", () => {
   test("author with full valid fields", () => {

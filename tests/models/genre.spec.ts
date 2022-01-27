@@ -1,7 +1,7 @@
 // models/genre.spec.ts
 import { connection, connect } from "mongoose";
-import { testMongoURL } from "../utils";
-import Genre from "./genre";
+import { testMongoURL } from "../../src/utils";
+import Genre from "../../src/models/genre";
 
 describe("valid Genre documents", () => {
   test("genre with full valid fields", () => {
