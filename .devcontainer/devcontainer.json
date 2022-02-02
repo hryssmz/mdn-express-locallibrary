@@ -1,7 +1,7 @@
 {
-  "name": "MDN Express Local Library Dev",
+  "name": "MDN Express Local Library",
   "dockerComposeFile": "./docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/home/dev/mdn-express-locallibrary",
-  "shutdownAction": "stopCompose"
+  "workspaceFolder": "/home/node/mdn-express-locallibrary",
+  "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
 }

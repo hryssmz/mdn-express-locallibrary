@@ -30,7 +30,7 @@ describe("valid BookInstance documents", () => {
     // Default to Maintenance.
     expect(bookInstance.status).toBe("Maintenance");
     // Default to current Date().
-    expect(Date.now() - Number(bookInstance.dueBack)).toBeLessThan(20);
+    expect(Date.now() - Number(bookInstance.dueBack)).toBeLessThan(100);
   });
 
   test("bookInstance with empty dueBack", () => {
@@ -108,7 +108,7 @@ describe("test DB interactions", () => {
     expect(bookInstances[0].book._id).toStrictEqual(book._id);
     expect(bookInstances[0].book.title).toBe(book.title);
     expect(bookInstances[0].imprint).toStrictEqual(bookInstance.imprint);
-    expect(Date.now() - Number(bookInstances[0].dueBack)).toBeLessThan(100);
+    expect(Date.now() - Number(bookInstances[0].dueBack)).toBeLessThan(1000);
   });
 
   test("does not save to DB if validation failed", async () => {
