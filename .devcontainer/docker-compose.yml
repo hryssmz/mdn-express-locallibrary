@@ -1,0 +1,21 @@
+services:
+  app:
+    image: mdn_express_locallibrary_dev
+    build: .
+    container_name: mdn_express_locallibrary_dev_app
+    ports:
+      - 33000:3000
+    volumes:
+      - ..:/home/dev/mdn-express-locallibrary
+    networks:
+      - mdn_express_locallibrary_dev
+  db:
+    image: mongo:5
+    container_name: mdn_express_locallibrary_dev_db
+    ports:
+      - 37017:27017
+    networks:
+      - mdn_express_locallibrary_dev
+
+networks:
+  mdn_express_locallibrary_dev:

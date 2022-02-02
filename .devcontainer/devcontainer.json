@@ -1,0 +1,7 @@
+{
+  "name": "MDN Express Local Library Dev",
+  "dockerComposeFile": "./docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/home/dev/mdn-express-locallibrary",
+  "shutdownAction": "stopCompose"
+}
