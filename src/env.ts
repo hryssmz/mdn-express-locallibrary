@@ -30,15 +30,6 @@ if (!process.env.DB_PORT) {
 }
 export const DB_PORT = Number(process.env.DB_PORT);
 
-// DB_USER
-export const DB_USER = process.env.DB_USER || "";
-
-// DB_PASS
-if (process.env.DB_USER && !process.env.DB_PASS) {
-  throw new Error("Environment variable DB_UESR set but DB_PASS not set!");
-}
-export const DB_PASS = process.env.DB_PASS || "";
-
 // DB_NAME
 if (!process.env.DB_NAME) {
   throw new Error("Environment variable DB_NAME not set!");

@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    command: npm start
     container_name: mdn-express-locallibrary-app
     depends_on:
       - db
@@ -10,31 +11,28 @@ services:
       APP_PORT: 3000
       DB_HOST: db
       DB_PORT: 27017
-      DB_USER: admin
-      DB_PASS: secret
       DB_NAME: local_library
     image: mdn-express-locallibrary
     networks:
-      - mdn-express-locallibrary
+      - default
     ports:
       - 3000:3000
     working_dir: /opt
 
   db:
     container_name: mdn-express-locallibrary-db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: secret
     image: mongo:5
     networks:
-      - mdn-express-locallibrary
+      - default
     volumes:
       - type: volume
-        source: mdn-express-locallibrary-db
+        source: db-data
         target: /data/db
 
 networks:
-  mdn-express-locallibrary-dev:
+  default:
+    name: mdn-express-locallibrary
 
 volumes:
-  mdn-express-locallibrary-db:
+  db-data:
+    name: mdn-express-locallibrary-db

@@ -1,10 +1,10 @@
 // scripts/initCatalog.ts
 import { connect, connection } from "mongoose";
-import { mongoURL } from "../src/utils";
-import Author from "../src/models/author";
-import Book from "../src/models/book";
-import BookInstance from "../src/models/bookInstance";
-import Genre from "../src/models/genre";
+import { mongoURL } from "../utils";
+import Author from "../models/author";
+import Book from "../models/book";
+import BookInstance from "../models/bookInstance";
+import Genre from "../models/genre";
 
 run();
 

@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "A simple Express local library app provided by MDN.",
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky install || exit 0",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "tsc --noEmit -p tsconfig.json && eslint --max-warnings=0 .",
     "test": "jest -o --coverage=false --detectOpenHandles",
-    "testAll": "jest --detectOpenHandles"
+    "testAll": "jest --detectOpenHandles",
+    "initDB": "ts-node src/scripts/initCatalog.ts"
   },
   "repository": {
     "type": "git",
