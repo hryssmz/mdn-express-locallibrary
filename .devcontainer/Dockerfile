@@ -7,7 +7,7 @@ RUN apt update -y && apt install -y --no-install-recommends \
   && apt clean && rm -rf /var/lib/apt/lists/*
 
 # Upgrade NPM.
-RUN npm install -g npm
+RUN npm install -g npm@latest
 
 # Enable sudo permission.
 RUN echo "node:p" | chpasswd \

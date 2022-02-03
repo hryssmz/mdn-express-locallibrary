@@ -9,7 +9,7 @@ services:
       NODE_ENV: production
       HOST:
       PORT: 3000
-      DB_ATLAS: FALSE
+      DB_ATLAS: "FALSE"
       DB_USER:
       DB_PASS:
       DB_HOST: db
