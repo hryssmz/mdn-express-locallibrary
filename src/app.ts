@@ -1,6 +1,8 @@
 // app.ts
 import path from "path";
+import compression from "compression";
 import express, { Request, Response, NextFunction } from "express";
+import helmet from "helmet";
 import createError, { HttpError } from "http-errors";
 import { connect } from "mongoose";
 import logger from "morgan";
@@ -18,6 +20,9 @@ connect(mongoURL)
   })
   .catch(console.error);
 
+// Setup helmet middleware.
+app.use(helmet());
+
 // Setup template engine.
 app.set("views", path.join(__dirname, "..", "views"));
 app.set("view engine", "pug");
@@ -25,6 +30,9 @@ app.set("view engine", "pug");
 // Setup request body parser.
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Setup compression middleware.
+app.use(compression());
 
 // Setup static assets.
 app.use(express.static(path.join(__dirname, "..", "public")));

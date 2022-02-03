@@ -13,10 +13,22 @@ export const NODE_ENV = process.env.NODE_ENV;
 export const APP_HOST = process.env.APP_HOST || "0.0.0.0";
 
 // APP_PORT
-if (!process.env.APP_PORT) {
-  throw new Error("Environment variable APP_PORT not set!");
+export const APP_PORT = Number(process.env.APP_PORT || "3000");
+
+// DB_ATLAS
+export const DB_ATLAS = process.env.DB_ATLAS || "FALSE";
+
+// DB_USER
+if (process.env.DB_ATLAS === "TRUE" && !process.env.DB_USER) {
+  throw new Error("Environment variable DB_USER not set!");
 }
-export const APP_PORT = Number(process.env.APP_PORT);
+export const DB_USER = process.env.DB_USER || "";
+
+// DB_PASS
+if (process.env.DB_ATLAS === "TRUE" && !process.env.DB_PASS) {
+  throw new Error("Environment variable DB_PASS not set!");
+}
+export const DB_PASS = process.env.DB_PASS || "";
 
 // DB_HOST
 if (!process.env.DB_HOST) {
@@ -25,10 +37,7 @@ if (!process.env.DB_HOST) {
 export const DB_HOST = process.env.DB_HOST;
 
 // DB_PORT
-if (!process.env.DB_PORT) {
-  throw new Error("Environment variable DB_PORT not set!");
-}
-export const DB_PORT = Number(process.env.DB_PORT);
+export const DB_PORT = Number(process.env.DB_PORT || "27017");
 
 // DB_NAME
 if (!process.env.DB_NAME) {

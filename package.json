@@ -8,8 +8,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "tsc --noEmit -p tsconfig.json && eslint --max-warnings=0 .",
-    "test": "jest -o --coverage=false --detectOpenHandles",
-    "testAll": "jest --detectOpenHandles",
+    "test": "jest -i -o --coverage=false",
+    "testAll": "jest -i",
     "initDB": "ts-node src/scripts/initCatalog.ts"
   },
   "repository": {
@@ -19,9 +19,11 @@
   "author": "Hiroyasu Shimizu",
   "license": "ISC",
   "dependencies": {
+    "compression": "^1.7.4",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
     "express-validator": "^6.14.0",
+    "helmet": "^5.0.2",
     "http-errors": "^2.0.0",
     "luxon": "^2.3.0",
     "mongoose": "^6.1.7",
@@ -33,6 +35,7 @@
     "@babel/preset-env": "^7.16.8",
     "@babel/preset-typescript": "^7.16.7",
     "@prettier/plugin-pug": "^1.19.1",
+    "@types/compression": "^1.7.2",
     "@types/express": "^4.17.13",
     "@types/http-errors": "^1.8.2",
     "@types/jest": "^27.4.0",
