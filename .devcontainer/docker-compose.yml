@@ -6,7 +6,7 @@ services:
     environment:
       NODE_ENV: development
       APP_HOST:
-      APP_PORT: 33000
+      APP_PORT: 3000
       DB_HOST: db
       DB_PORT: 27017
       DB_NAME: local_library
@@ -14,7 +14,7 @@ services:
     networks:
       - default
     ports:
-      - 33000:33000
+      - 33000:3000
     user: node
     tty: true
     volumes:
@@ -27,6 +27,8 @@ services:
     image: mongo:5
     networks:
       - default
+    ports:
+      - 37017:27017
     volumes:
       - type: volume
         source: db-data
