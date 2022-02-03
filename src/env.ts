@@ -9,11 +9,11 @@ if (!process.env.NODE_ENV) {
 }
 export const NODE_ENV = process.env.NODE_ENV;
 
-// APP_HOST
-export const APP_HOST = process.env.APP_HOST || "0.0.0.0";
+// HOST
+export const HOST = process.env.HOST || "0.0.0.0";
 
-// APP_PORT
-export const APP_PORT = Number(process.env.APP_PORT || "3000");
+// PORT
+export const PORT = Number(process.env.PORT || "3000");
 
 // DB_ATLAS
 export const DB_ATLAS = process.env.DB_ATLAS || "FALSE";
