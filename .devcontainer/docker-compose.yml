@@ -1,27 +1,45 @@
 services:
   app:
     build: .
-    container_name: mdn_express_locallibrary_dev_app
+    container_name: mdn-express-locallibrary-app-dev
     depends_on:
       - db
-    env_file:
-      - .env
-    image: mdn_express_locallibrary_dev
+    environment:
+      NODE_ENV: development
+      APP_HOST:
+      APP_PORT: 33000
+      DB_HOST: db
+      DB_PORT: 27017
+      DB_USER: admin
+      DB_PASS: secret
+      DB_NAME: local_library
+    image: mdn-express-locallibrary-dev
     networks:
-      - mdn_express_locallibrary_dev
+      - mdn-express-locallibrary-dev
     ports:
-      - 33000:3000
+      - 33000:33000
     tty: true
     volumes:
-      - ..:/home/node/mdn-express-locallibrary
+      - type: bind
+        source: ..
+        target: /home/node/mdn-express-locallibrary
     working_dir: /home/node/mdn-express-locallibrary
+
   db:
+    container_name: mdn-express-locallibrary-db-dev
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
     image: mongo:5
-    container_name: mdn_express_locallibrary_dev_db
-    ports:
-      - 37017:27017
     networks:
-      - mdn_express_locallibrary_dev
+      - mdn-express-locallibrary-dev
+    volumes:
+      - type: volume
+        source: mdn-express-locallibrary-db-dev
+        target: /data/db
 
 networks:
-  mdn_express_locallibrary_dev:
+  mdn-express-locallibrary-dev:
+
+volumes:
+  mdn-express-locallibrary-db-dev:

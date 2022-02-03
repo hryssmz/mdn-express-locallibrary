@@ -1,7 +1,9 @@
 // utils/index.ts
-const dbhost = process.env.DB_HOST || "localhost";
-const dbport = process.env.DB_PORT || "27017";
-const dbname = process.env.DB_NAME || "local_library";
+import { DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER } from "../env";
 
-export const mongoURL = `mongodb://${dbhost}:${dbport}/${dbname}`;
-export const testMongoURL = `mongodb://${dbhost}:${dbport}/test`;
+const mongoBaseURL = DB_USER
+  ? `mongodb://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/`
+  : `mongodb://${DB_HOST}:${DB_PORT}`;
+
+export const mongoURL = `${mongoBaseURL}/${DB_NAME}`;
+export const testMongoURL = `${mongoBaseURL}/test`;

@@ -4,6 +4,7 @@ import express, { Request, Response, NextFunction } from "express";
 import createError, { HttpError } from "http-errors";
 import { connect } from "mongoose";
 import logger from "morgan";
+import { NODE_ENV } from "./env";
 import { mongoURL } from "./utils";
 import catalogRouter from "./routes/catalog";
 import indexRouter from "./routes";
@@ -46,7 +47,7 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   res.status(err.status || 500);
   return res.render("error", {
     message: err.message,
-    error: req.app.get("env") === "development" ? err : {},
+    error: NODE_ENV === "development" ? err : {},
   });
 });
 
